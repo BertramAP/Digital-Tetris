@@ -1,0 +1,10 @@
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:99:42: not found: value displayBlocks[0m
+[0m[[0m[31merror[0m] [0m[0m    io.spriteVisible(blockIndexes(i)) := displayBlocks(i)[0m
+[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:128:9: not found: value sprite0FlipHorizontalReg[0m
+[0m[[0m[31merror[0m] [0m[0m        sprite0FlipHorizontalReg := false.B[0m
+[0m[[0m[31merror[0m] [0m[0m        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameTop.scala:54:30: not found: type GameLogicTask0[0m
+[0m[[0m[31merror[0m] [0m[0m  val gameLogic = Module(new GameLogicTask0(SPRITE_NUMBER, BACK_TILE_NUMBER, TUNE_NUMBER))[0m
+[0m[[0m[31merror[0m] [0m[0m                             ^[0m
+[0m[[0m[31merror[0m] [0m[0mthree errors found[0m
