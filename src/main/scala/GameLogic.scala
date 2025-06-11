@@ -55,26 +55,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     val playingTune = Input(Vec(TuneNumber, Bool()))
     val tuneId = Output(UInt(log2Up(TuneNumber).W))
   })
-
+  val idle :: compute1 :: done :: Nil = Enum(3)
+  val stateReg = RegInit(idle)
   // Setting all led outputs to zero
   // It can be done by the single expression below...
   io.led := Seq.fill(8)(false.B)
-
-  // Or one by one...
-  //io.led(0) := false.B
-  //io.led(0) := false.B
-  //io.led(1) := false.B
-  //io.led(2) := false.B
-  //io.led(3) := false.B
-  //io.led(4) := false.B
-  //io.led(5) := false.B
-  //io.led(6) := false.B
-  //io.led(7) := false.B
-
-  // Or with a for loop.
-  //for (i <- 0 until 8) {
-  //  io.led(i) := false.B
-  //}
 
   //Setting all sprite control outputs to zero
   io.spriteXPosition := Seq.fill(SpriteNumber)(0.S)
@@ -105,10 +90,21 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.pauseTune := Seq.fill(TuneNumber)(false.B)
   io.tuneId := 0.U
 
-  /////////////////////////////////////////////////////////////////
-  // Write here your game logic
-  // (you might need to change the initialization values above)
-  /////////////////////////////////////////////////////////////////
+  switch(stateReg) {
+    is(idle) {
+      when(io.newFrame) {
+        stateReg := compute1
+      }
+    }
+    is(compute1) {
+      // add gravity logic to sprites
+      stateReg := done
+    }
+    is(done) {
+      io.frameUpdateDone :=true.B
+      stateReg := idle
+    }
+  }
 
   // Just forwarding the newFrame into the frameUpdateDone with a 2 clock cycle delay
   // frameUpdateDone will need to be driven by your game logic FSMs
