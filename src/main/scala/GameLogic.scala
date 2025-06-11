@@ -8,7 +8,7 @@
 import chisel3._
 import chisel3.util._
 
-class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
+class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends Module {
   val io = IO(new Bundle {
     //Buttons
     val btnC = Input(Bool())
@@ -29,6 +29,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
     val spriteVisible = Output(Vec(SpriteNumber, Bool()))
     val spriteFlipHorizontal = Output(Vec(SpriteNumber, Bool()))
     val spriteFlipVertical = Output(Vec(SpriteNumber, Bool()))
+    val spriteScaleUpHorizontal = Output(Vec(SpriteNumber, Bool()))
+    val spriteScaleDownHorizontal = Output(Vec(SpriteNumber, Bool()))
+    val spriteScaleUpVertical = Output(Vec(SpriteNumber, Bool()))
+    val spriteScaleDownVertical = Output(Vec(SpriteNumber, Bool()))
 
     //Viewbox control output
     val viewBoxX = Output(UInt(10.W)) //0 to 640
@@ -42,6 +46,13 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
     //Status
     val newFrame = Input(Bool())
     val frameUpdateDone = Output(Bool())
+    //Tune
+    val startTune = Output(Vec(TuneNumber, Bool()))
+    val stopTune = Output(Vec(TuneNumber, Bool()))
+    val pauseTune = Output(Vec(TuneNumber, Bool()))
+    val playingTune = Input(Vec(TuneNumber, Bool()))
+    val tuneId = Output(UInt(log2Up(TuneNumber).W))
+
   })
 
   // Setting all led outputs to zero
@@ -54,12 +65,24 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
   io.spriteVisible := Seq.fill(SpriteNumber)(false.B)
   io.spriteFlipHorizontal := Seq.fill(SpriteNumber)(false.B)
   io.spriteFlipVertical := Seq.fill(SpriteNumber)(false.B)
+  io.spriteFlipVertical := Seq.fill(SpriteNumber)(false.B)
+  io.spriteScaleUpHorizontal := Seq.fill(SpriteNumber)(false.B)
+  io.spriteScaleDownHorizontal := Seq.fill(SpriteNumber)(false.B)
+  io.spriteScaleUpVertical := Seq.fill(SpriteNumber)(false.B)
+  io.spriteScaleDownVertical := Seq.fill(SpriteNumber)(false.B)
 
   //Setting the viewbox control outputs to zero
   val viewBoxXReg = RegInit(0.U(10.W))
   val viewBoxYReg = RegInit(0.U(9.W))
+
   io.viewBoxX := viewBoxXReg
   io.viewBoxY := viewBoxYReg
+
+  //Setting sound engine outputs to zero
+  io.startTune := Seq.fill(TuneNumber)(false.B)
+  io.stopTune := Seq.fill(TuneNumber)(false.B)
+  io.pauseTune := Seq.fill(TuneNumber)(false.B)
+  io.tuneId := 0.U
 
   // Background animation
   val enable = RegInit(true.B)
@@ -69,9 +92,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
   val yMax = 15.U
 
   //Setting the background buffer outputs to zero
-  io.backBufferWriteData := Mux(y === 12.U, 8.U, 9.U)
-  io.backBufferWriteAddress := 40.U * y + x
-  io.backBufferWriteEnable := enable
+  io.backBufferWriteData := 0.U
+  io.backBufferWriteAddress := 0.U
+  io.backBufferWriteEnable := false.B
 
   //Setting frame done to zero
   io.frameUpdateDone := false.B
@@ -95,9 +118,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
   val showBlocks = RegInit(VecInit(Seq.fill(16)(false.B))) 
 
   // Connect
-  for (i <- 0 until 16) {
-    io.spriteVisible(blockIndexes(i)) := displayBlocks(i)
-  }
+
   //FSMD switch
   switch(stateReg) {
     is(idle) {
@@ -125,7 +146,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
       // Right movement
       when(io.btnR) {
         val newX = spriteXPosReg + 2.S
-        sprite0FlipHorizontalReg := false.B
         when( (newX + 32.S) > (640.S + viewBoxXReg.asSInt ) ) {
           // viewBoxXReg := 640.U - (newX.asUInt + 32.U)
           viewBoxXReg := viewBoxXReg + 2.U
@@ -146,7 +166,3 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int) extends Module {
     }
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// End of file
-//////////////////////////////////////////////////////////////////////////////
