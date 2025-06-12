@@ -1,4 +1,20 @@
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:159:23: reassignment to val[0m
-[0m[[0m[31merror[0m] [0m[0m          currentMode = moving[0m
-[0m[[0m[31merror[0m] [0m[0m                      ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:11:74: TuneNumber is already defined as value TuneNumber[0m
+[0m[[0m[31merror[0m] [0m[0mclass GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int, TuneNumber: Int) extends Module {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:36:9: spriteScaleUpHorizontal is already defined as value spriteScaleUpHorizontal[0m
+[0m[[0m[31merror[0m] [0m[0m    val spriteScaleUpHorizontal = Output(Vec(SpriteNumber, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:37:9: spriteScaleDownHorizontal is already defined as value spriteScaleDownHorizontal[0m
+[0m[[0m[31merror[0m] [0m[0m    val spriteScaleDownHorizontal = Output(Vec(SpriteNumber, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:38:9: spriteScaleUpVertical is already defined as value spriteScaleUpVertical[0m
+[0m[[0m[31merror[0m] [0m[0m    val spriteScaleUpVertical = Output(Vec(SpriteNumber, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:39:9: spriteScaleDownVertical is already defined as value spriteScaleDownVertical[0m
+[0m[[0m[31merror[0m] [0m[0m    val spriteScaleDownVertical = Output(Vec(SpriteNumber, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameTop.scala:53:26: not enough arguments for constructor GameLogic: (SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int, TuneNumber: Int): GameLogic.[0m
+[0m[[0m[31merror[0m] [0m[0mUnspecified value parameter TuneNumber.[0m
+[0m[[0m[31merror[0m] [0m[0m  val gameLogic = Module(new GameLogic(SPRITE_NUMBER, BACK_TILE_NUMBER, TUNE_NUMBER))[0m
+[0m[[0m[31merror[0m] [0m[0m                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m6 errors found[0m

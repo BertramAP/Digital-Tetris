@@ -88,7 +88,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val writingCount = RegInit(0.U(2.W))
   val enable = RegInit(false.B)
 
-  //Setting the background buffer outputs
+  //Setting the background buffer outputs to zero
   io.backBufferWriteData := 1.U
   io.backBufferWriteAddress := writingCount
   io.backBufferWriteEnable := enable
@@ -200,7 +200,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       /*
       when(io.btnR) {
         val newX = spriteXPosReg + 2.S
-        sprite0FlipHorizontalReg := false.B
         when( (newX + 32.S) > (640.S + viewBoxXReg.asSInt ) ) {
           // viewBoxXReg := 640.U - (newX.asUInt + 32.U)
           viewBoxXReg := viewBoxXReg + 2.U
@@ -221,7 +220,3 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     }
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// End of file
-//////////////////////////////////////////////////////////////////////////////
