@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes.bak[0m
 [0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
@@ -9,3 +10,7 @@
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes.bak[0m
+=======
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = C:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\target\scala-2.13\classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: C:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\target\scala-2.13\classes.bak[0m
+>>>>>>> 599b4518d3c4cca2c55f56d24ceca9e1eefacc4a

@@ -2,6 +2,7 @@
 Start screen by having the viewbox a different location. \
 The grid array contains 2 bits, where 00 is empty and then 01 can be the color red. \
 Make a better sprite for number 1. \
+When clearing lines, make the camera shake a little by changing the viewbox.
 ## Tile numbers
 ## Tile 0
 ![img.png](images/Background.png)
@@ -21,6 +22,8 @@ number A?
 ![img.png](images/letterC.png)
 ## Tile 8
 ![img.png](images/letterR.png)
+## Tile 9
+![img.png](images/letterL.png)
 ## Tile 10
 ![img_1.png](images/number0.png)
 ## Tile 11
@@ -31,8 +34,18 @@ number A?
 ![img.png](images/number3.png)
 ## Tile 14
 ![img.png](images/number4.png)
+## Tile 15
+![img.png](images/number15.png)
+## Tile 16
+![img.png](images/number6.png)
+## Tile 17
+![img.png](images/number7.png)
 ## Tile 18
 ![img.png](images/number8.png)
+## Tile 19
+![img_1.png](images/number9.png)
+## Tile 20
+![img.png](images/letterV.png)
 ## Tile 29
 ![img.png](images/tile29.png)
 ## Tile 30
