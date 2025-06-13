@@ -56,7 +56,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   })
 
   // Setting all led outputs to zero
-  // It can be done by the single expression below...
   io.led := Seq.fill(8)(false.B)
 
   //Setting all sprite control outputs to zero  
@@ -70,7 +69,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.spriteScaleUpVertical := Seq.fill(SpriteNumber)(false.B)
   io.spriteScaleDownVertical := Seq.fill(SpriteNumber)(false.B)
 
-  //Setting the viewbox control outputs to zero
+  //Viewbox
   val viewBoxXReg = RegInit(0.U(10.W))
   val viewBoxYReg = RegInit(0.U(9.W))
   io.viewBoxX := viewBoxXReg
@@ -97,12 +96,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.frameUpdateDone := false.B
 
   // States
-  val idle :: compute1 :: done :: Nil = Enum(3)
+  val idle :: task :: compute1 :: done :: Nil = Enum(4)
   val stateReg = RegInit(idle)
 
   //Two registers holding the sprite sprite X and Y with the sprite initial position
-  val blockStartX = -128.S(11.W)
-  val blockStartY = 224.S(10.W)
+  val blockStartX = -4.S(11.W)
+  val blockStartY = 8.S(10.W)
   val blockXReg = RegInit(blockStartX)
   val blockYReg = RegInit(blockStartY)
 
@@ -116,31 +115,45 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val sRight :: sLeft :: Nil = Enum(2)
   val blockType = io.sw(0)
 
+  io.led(0) := blockXReg(0)
+  io.led(1) := blockXReg(1)
+  io.led(2) := blockXReg(2)
+  io.led(3) := blockXReg(3)
+  io.led(4) := blockXReg(4)
+  io.led(5) := blockXReg(5)
+  io.led(6) := blockXReg(6)
+
+  // Blockoffsets
+  val sRightOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
+  val sRightOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
+  val sLeftOffsetX = VecInit(3.S(4.W), 3.S(4.W), 2.S(4.W), 2.S(4.W))
+  val sLeftOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
+
   // Set position of relevant sprites
   switch (blockType) {
     // Red
     is (false.B) {
       for (i <- 0 until 4) { io.spriteVisible(i) := true.B }
-      io.spriteXPosition(0) := blockXReg + 64.S
-      io.spriteYPosition(0) := blockYReg + 32.S
-      io.spriteXPosition(1) := blockXReg + 64.S
-      io.spriteYPosition(1) := blockYReg + 64.S
-      io.spriteXPosition(2) := blockXReg + 96.S
-      io.spriteYPosition(2) := blockYReg + 64.S
-      io.spriteXPosition(3) := blockXReg + 96.S
-      io.spriteYPosition(3) := blockYReg + 96.S
+      io.spriteXPosition(0) := (blockXReg + sRightOffsetX(0)) << 5
+      io.spriteYPosition(0) := (blockYReg + sRightOffsetY(0)) << 5
+      io.spriteXPosition(1) := (blockXReg + sRightOffsetX(1)) << 5
+      io.spriteYPosition(1) := (blockYReg + sRightOffsetY(1)) << 5
+      io.spriteXPosition(2) := (blockXReg + sRightOffsetX(2)) << 5
+      io.spriteYPosition(2) := (blockYReg + sRightOffsetY(2)) << 5
+      io.spriteXPosition(3) := (blockXReg + sRightOffsetX(3)) << 5
+      io.spriteYPosition(3) := (blockYReg + sRightOffsetY(3)) << 5
     }
     // Yellow
     is (true.B) {
       for (i <- 4 until 8) { io.spriteVisible(i) := true.B }
-      io.spriteXPosition(4) := blockXReg + 96.S
-      io.spriteYPosition(4) := blockYReg + 32.S
-      io.spriteXPosition(5) := blockXReg + 96.S
-      io.spriteYPosition(5) := blockYReg + 64.S
-      io.spriteXPosition(6) := blockXReg + 64.S
-      io.spriteYPosition(6) := blockYReg + 64.S
-      io.spriteXPosition(7) := blockXReg + 64.S
-      io.spriteYPosition(7) := blockYReg + 96.S
+      io.spriteXPosition(4) := (blockXReg + sLeftOffsetX(0)) << 5
+      io.spriteYPosition(4) := (blockYReg + sLeftOffsetY(0)) << 5
+      io.spriteXPosition(5) := (blockXReg + sLeftOffsetX(1)) << 5
+      io.spriteYPosition(5) := (blockYReg + sLeftOffsetY(1)) << 5
+      io.spriteXPosition(6) := (blockXReg + sLeftOffsetX(2)) << 5
+      io.spriteYPosition(6) := (blockYReg + sLeftOffsetY(2)) << 5
+      io.spriteXPosition(7) := (blockXReg + sLeftOffsetX(3)) << 5
+      io.spriteYPosition(7) := (blockYReg + sLeftOffsetY(3)) << 5
     }
   }
 
@@ -167,9 +180,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       .otherwise {
         when (moveCnt === maxCount - 1.U) {
           moveCnt := 0.U
-          val newX = blockXReg + 32.S
+          val newX = blockXReg + 1.S
+
           // Collision with bottom on next cycle
-          when (newX > 512.S) {
+          when (newX > 16.S) {
             currentMode := writingBG
             enable := true.B
             writingCount := 0.U
@@ -180,9 +194,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
 
       when (io.btnL) {
-        blockYReg := blockYReg + 32.S
+        blockYReg := blockYReg + 1.S
       } .elsewhen (io.btnR) {
-        blockYReg := blockYReg - 32.S
+        blockYReg := blockYReg - 1.S
       }
 
       // Movement
