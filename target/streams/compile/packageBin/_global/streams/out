@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [0m[[0m[0mdebug[0m] [0m[0mPackaging /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/digital-tetris_2.13-0.1.0-SNAPSHOT.jar ...[0m
 [0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
 [0m[[0m[0mdebug[0m] [0m[0m	SoundEngine.class[0m
@@ -35,6 +34,10 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/Top$delayedInit$body.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	Top$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/Top$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/PosToIndex$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/PosToIndex.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/MultiHotPriortyReductionTree$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
@@ -50,6 +53,3 @@
 [0m[[0m[0mdebug[0m] [0m[0m	Top.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes/Top.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
-=======
-[0m[[0m[0mdebug[0m] [0m[0mJar uptodate: C:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\target\scala-2.13\digital-tetris_2.13-0.1.0-SNAPSHOT.jar[0m
->>>>>>> 599b4518d3c4cca2c55f56d24ceca9e1eefacc4a

@@ -82,14 +82,19 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.tuneId := 0.U
 
   // For writing to background
-  val moving :: writingBG :: Nil = Enum(2)
-  val currentMode = RegInit(moving)
+  val nothing :: writingBlock :: Nil = Enum(2)
+  val currentTask = RegInit(nothing)
   val writingCount = RegInit(0.U(2.W))
   val enable = RegInit(false.B)
 
+  // Modules
+  val posToIndex = Module(new PosToIndex)
+  posToIndex.io.xPos := 0.S
+  posToIndex.io.yPos := 0.S
+
   //Setting the background buffer outputs to zero
-  io.backBufferWriteData := 1.U
-  io.backBufferWriteAddress := writingCount
+  io.backBufferWriteData := 0.U
+  io.backBufferWriteAddress := posToIndex.io.index
   io.backBufferWriteEnable := enable
 
   //Setting frame done to zero
@@ -115,14 +120,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val sRight :: sLeft :: Nil = Enum(2)
   val blockType = io.sw(0)
 
-  io.led(0) := blockXReg(0)
-  io.led(1) := blockXReg(1)
-  io.led(2) := blockXReg(2)
-  io.led(3) := blockXReg(3)
-  io.led(4) := blockXReg(4)
-  io.led(5) := blockXReg(5)
-  io.led(6) := blockXReg(6)
-
   // Blockoffsets
   val sRightOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
   val sRightOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
@@ -143,7 +140,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       io.spriteXPosition(3) := (blockXReg + sRightOffsetX(3)) << 5
       io.spriteYPosition(3) := (blockYReg + sRightOffsetY(3)) << 5
     }
-    // Yellow
+    // Green
     is (true.B) {
       for (i <- 4 until 8) { io.spriteVisible(i) := true.B }
       io.spriteXPosition(4) := (blockXReg + sLeftOffsetX(0)) << 5
@@ -165,67 +162,63 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
     }
 
-    is(compute1) {
-      // Writing background
-      when (currentMode === writingBG) {
-        when (writingCount === 3.U) {
-          writingCount := 0.U
-          currentMode := moving
-          blockXReg := blockStartX
-          blockYReg := blockStartY
-        }
-        .otherwise { writingCount := writingCount + 1.U }
-      }
-      // Downwards movement
-      .otherwise {
-        when (moveCnt === maxCount - 1.U) {
-          moveCnt := 0.U
-          val newX = blockXReg + 1.S
+    is (task) {
+      switch (currentTask) {
+        is (writingBlock) {
 
-          // Collision with bottom on next cycle
-          when (newX > 16.S) {
-            currentMode := writingBG
-            enable := true.B
-            writingCount := 0.U
+          // Getting backbuffer address of current block
+          switch (blockType) {
+            is (false.B) {
+              posToIndex.io.xPos := blockXReg + sRightOffsetX(writingCount)
+              posToIndex.io.yPos := blockYReg + sRightOffsetY(writingCount)
+              io.backBufferWriteData := 21.U
+            }
+            is (true.B) {
+              posToIndex.io.xPos := blockXReg + sLeftOffsetX(writingCount)
+              posToIndex.io.yPos := blockYReg + sLeftOffsetY(writingCount)
+              io.backBufferWriteData := 22.U
+            }
           }
-          .otherwise { blockXReg := newX }
-        }
-        .otherwise { moveCnt := moveCnt + 1.U }
-      }
 
+          when (writingCount === 3.U) {
+            writingCount := 0.U
+            blockXReg := blockStartX
+            blockYReg := blockStartY
+            currentTask := nothing
+            enable := false.B
+            stateReg := done
+          }
+          .otherwise { writingCount := writingCount + 1.U }
+        }
+      }
+    }
+
+    is(compute1) {
+      val nextState = WireInit(done)
+
+      // Downwards movement
+      when (moveCnt === maxCount - 1.U) {
+        moveCnt := 0.U
+        val newX = blockXReg + 1.S
+
+        // Collision with bottom on next cycle
+        when (newX > 16.S) {
+          nextState := task
+          currentTask := writingBlock
+          enable := true.B
+        }
+        .otherwise { blockXReg := newX }
+      }
+      .otherwise { moveCnt := moveCnt + 1.U }
+
+      // Sideways movement
       when (io.btnL) {
         blockYReg := blockYReg + 1.S
       } .elsewhen (io.btnR) {
         blockYReg := blockYReg - 1.S
       }
 
-      // Movement
-      /*
-      when(io.btnD) {
-        blockXReg := blockXReg + 32.S
-      } .elsewhen(io.btnU){
-        blockXReg := blockXReg - 32.S
-      }*/
-
-      // Player: SInt(11.W)
-      // Bounding box: UInt(10.W)
-
-      // Right movement
-      /*
-      when(io.btnR) {
-        val newX = spriteXPosReg + 2.S
-        when( (newX + 32.S) > (640.S + viewBoxXReg.asSInt ) ) {
-          // viewBoxXReg := 640.U - (newX.asUInt + 32.U)
-          viewBoxXReg := viewBoxXReg + 2.U
-        }
-        spriteXPosReg := newX
-      }
-      
-      // Left movement
-      .elsewhen(io.btnL) {
-      }*/
-
-      stateReg := done
+      stateReg := nextState
     }
 
     is(done) {

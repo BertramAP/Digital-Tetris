@@ -1,57 +1,8 @@
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:129:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteXPosition(0) := (blockXReg + sRightOffsetX(0)).asSInt(50.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:130:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteYPosition(0) := (blockYReg + sRightOffsetY(0)).asSInt(10.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:131:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteXPosition(1) := (blockXReg + sRightOffsetX(1)).asSInt(11.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:132:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteYPosition(1) := (blockYReg + sRightOffsetY(1)).asSInt(10.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:133:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteXPosition(2) := (blockXReg + sRightOffsetX(2)).asSInt(11.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:134:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteYPosition(2) := (blockYReg + sRightOffsetY(2)).asSInt(10.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:135:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteXPosition(3) := (blockXReg + sRightOffsetX(3)).asSInt(11.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:136:63: overloaded method apply with alternatives:[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: chisel3.UInt)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: Int)chisel3.Bool <and>[0m
-[0m[[0m[31merror[0m] [0m[0m  (x: BigInt)chisel3.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m cannot be applied to (chisel3.internal.firrtl.Width)[0m
-[0m[[0m[31merror[0m] [0m[0m      io.spriteYPosition(3) := (blockYReg + sRightOffsetY(3)).asSInt(10.W) << 5[0m
-[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
-[0m[[0m[31merror[0m] [0m[0m8 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:172:49: not found: value sRightOffset[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.xPos := blockXReg + sRightOffset(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:177:29: value yPOs is not a member of chisel3.Bundle{val xPos: chisel3.SInt; val yPos: chisel3.SInt; val index: chisel3.UInt}[0m
+[0m[[0m[31merror[0m] [0m[0mdid you mean yPos? or perhaps xPos?[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.yPOs := blockYReg + sLeftOffsetY(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m

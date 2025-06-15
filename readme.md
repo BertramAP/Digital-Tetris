@@ -46,6 +46,10 @@ number A?
 ![img_1.png](images/number9.png)
 ## Tile 20
 ![img.png](images/letterV.png)
+## Tile 21
+![img.png](images/tile21.png)
+## Tile 22
+![img.png](images/tile22.png)
 ## Tile 29
 ![img.png](images/tile29.png)
 ## Tile 30
