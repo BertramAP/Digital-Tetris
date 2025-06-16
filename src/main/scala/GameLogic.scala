@@ -111,10 +111,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val blockYReg = RegInit(blockStartY)
 
   // Sprite movement
-  val scalaMaxCount = 60
+  val scalaMaxCount = 120
   val maxCount = scalaMaxCount.U
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
-
+  val realCnt = RegInit(0.U(6.W))
   // Block registers
   // val block :: pipe :: sRight :: sLeft :: lRight :: lLeft :: t :: Nil = Enum(7)
   val sRight :: sLeft :: Nil = Enum(2)
@@ -132,10 +132,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val z2OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
   val z2OffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
 
-  //Movementspeed for block falling down
-  val movementXspeed = RegInit(1.S(3.W))
-
+  //Rotation for current piece
   val rotation = RegInit(0.U(2.W))
+  //Up input release detect.
+  val upRelease = true.B
   // Set position of relevant sprites
   switch (blockType) {
     // Red
@@ -144,32 +144,14 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         for (i <- 0 until 4) {
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + sOffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + sOffsetY(i)) << 5 // klods til højre fra centrum?
-
-        } /*
-        io.spriteXPosition(0) := (blockXReg + sOffsetX(0)) << 5
-        io.spriteYPosition(0) := (blockYReg + sOffsetY(0)) << 5 // klods til højre fra centrum?
-        io.spriteXPosition(1) := (blockXReg + sOffsetX(1)) << 5
-        io.spriteYPosition(1) := (blockYReg + sOffsetY(1)) << 5 //Klodsens center?
-        io.spriteXPosition(2) := (blockXReg + sOffsetX(2)) << 5
-        io.spriteYPosition(2) := (blockYReg + sOffsetY(2)) << 5 //Klods under center
-        io.spriteXPosition(3) := (blockXReg + sOffsetX(3)) << 5
-        io.spriteYPosition(3) := (blockYReg + sOffsetY(3)) << 5 // Klods i nederst venstre hjørne? */
+          io.spriteYPosition(i) := (blockYReg + sOffsetY(i)) << 5
+        }
       }.otherwise {
         for (i <- 0 until 4) {
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + s2OffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + s2OffsetY(i)) << 5 // klods til højre fra centrum?
+          io.spriteYPosition(i) := (blockYReg + s2OffsetY(i)) << 5
         }
-        /*
-        io.spriteXPosition(0) := (blockXReg + s2OffsetX(0)) << 5
-        io.spriteYPosition(0) := (blockYReg + s2OffsetY(0)) << 5 // klods til højre fra centrum?
-        io.spriteXPosition(1) := (blockXReg + s2OffsetX(1)) << 5
-        io.spriteYPosition(1) := (blockYReg + s2OffsetY(1)) << 5 //Klodsens center
-        io.spriteXPosition(2) := (blockXReg + s2OffsetX(2)) << 5
-        io.spriteYPosition(2) := (blockYReg + s2OffsetY(2)) << 5 //klodsens top
-        io.spriteXPosition(3) := (blockXReg + s2OffsetX(3)) << 5
-        io.spriteYPosition(3) := (blockYReg + s2OffsetY(3)) << 5 //Klods nederst højre */
       }
     }
     // Green
@@ -179,20 +161,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + zOffsetX(i-4)) << 5
           io.spriteYPosition(i) := (blockYReg + zOffsetY(i-4)) << 5
-        } /*
-        io.spriteXPosition(4) := (blockXReg + zOffsetX(0)) << 5
-        io.spriteYPosition(4) := (blockYReg + zOffsetY(0)) << 5
-        io.spriteXPosition(5) := (blockXReg + zOffsetX(1)) << 5
-        io.spriteYPosition(5) := (blockYReg + zOffsetY(1)) << 5
-        io.spriteXPosition(6) := (blockXReg + zOffsetX(2)) << 5
-        io.spriteYPosition(6) := (blockYReg + zOffsetY(2)) << 5
-        io.spriteXPosition(7) := (blockXReg + zOffsetX(3)) << 5
-        io.spriteYPosition(7) := (blockYReg + zOffsetY(3)) << 5 */
+        }
       }.otherwise {
         for (i <- 4 until 8) {
           io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + zOffsetX(i - 4)) << 5
-          io.spriteYPosition(i) := (blockYReg + zOffsetY(i - 4)) << 5
+          io.spriteXPosition(i) := (blockXReg + z2OffsetX(i - 4)) << 5
+          io.spriteYPosition(i) := (blockYReg + z2OffsetY(i - 4)) << 5
         }
       }
     }
@@ -205,7 +179,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         stateReg := compute1
       }
     }
-
     is (task) {
       switch (currentTask) {
         is (writingBlock) {
@@ -213,17 +186,28 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           // Getting backbuffer address of current block
           switch (blockType) {
             is (false.B) {
-              posToIndex.io.xPos := blockXReg + sOffsetX(writingCount)
-              posToIndex.io.yPos := blockYReg + sOffsetY(writingCount)
-              io.backBufferWriteData := 21.U
+              when(rotation === 0.U || rotation === 2.U) {
+                posToIndex.io.xPos := blockXReg + sOffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + sOffsetY(writingCount)
+                io.backBufferWriteData := 21.U
+              }.otherwise{
+                posToIndex.io.xPos := blockXReg + s2OffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + s2OffsetY(writingCount)
+                io.backBufferWriteData := 21.U
+              }
             }
             is (true.B) {
-              posToIndex.io.xPos := blockXReg + zOffsetX(writingCount)
-              posToIndex.io.yPos := blockYReg + zOffsetY(writingCount)
-              io.backBufferWriteData := 22.U
+              when(rotation === 0.U || rotation === 2.U) {
+                posToIndex.io.xPos := blockXReg + zOffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + zOffsetY(writingCount)
+                io.backBufferWriteData := 22.U
+              }.otherwise {
+                posToIndex.io.xPos := blockXReg + z2OffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + z2OffsetY(writingCount)
+                io.backBufferWriteData := 22.U
+              }
             }
           }
-
           when (writingCount === 3.U) {
             writingCount := 0.U
             blockXReg := blockStartX
@@ -231,8 +215,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             currentTask := nothing
             enable := false.B
             stateReg := done
-          }
-          .otherwise { writingCount := writingCount + 1.U }
+          }.otherwise { writingCount := writingCount + 1.U }
         }
       }
     }
@@ -241,48 +224,45 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       val nextState = WireInit(done)
 
       // Downwards movement
-      when(moveCnt === maxCount - 1.U) {
+      when(moveCnt === realCnt) {
         moveCnt := 0.U
-        val newX = blockXReg + movementXspeed
+        val newX = blockXReg + 1.S
 
         // Collision with bottom on next cycle
         when(newX > 16.S) {
           nextState := task
           currentTask := writingBlock
           enable := true.B
-        }
-          .otherwise {
+        }.otherwise {
             blockXReg := newX
-          }
-      }
-        .otherwise {
-          moveCnt := moveCnt + 1.U
         }
-
+      }.otherwise {
+          moveCnt := moveCnt + 1.U
+      }
       // Sideways movement
       when(io.btnL) {
         blockYReg := blockYReg + 1.S
       }.elsewhen(io.btnR) {
         blockYReg := blockYReg - 1.S
       }
-      //Increase falling speed when pressing down
+      //Increase falling speed when pressing down, by halving the counter value
       when(io.btnD) {
-        movementXspeed := 2.S
+        realCnt := maxCount >> 1
       }.otherwise {
-        movementXspeed := 1.S //
+        realCnt := maxCount
       }
       //Rotates tetris piece on up input
-      when(io.btnU) {
+      when(io.btnU && upRelease) {
         when(rotation === 3.U) {
           rotation := 0.U
-        }
-          .otherwise {
+        }.otherwise {
             rotation := rotation + 1.U
-          }
+        }
+        upRelease := false.B
+      }. elsewhen(!io.btnU) {
+        upRelease := true.B
       }
-
       stateReg := nextState
-
     }
     is(done) {
       io.frameUpdateDone := true.B
