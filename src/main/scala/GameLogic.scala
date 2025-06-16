@@ -53,12 +53,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     val pauseTune = Output(Vec(TuneNumber, Bool()))
     val playingTune = Input(Vec(TuneNumber, Bool()))
     val tuneId = Output(UInt(log2Up(TuneNumber).W))
-  })
+
+    })
 
   // Setting all led outputs to zero
   io.led := Seq.fill(8)(false.B)
-
-  //Setting all sprite control outputs to zero  
+  //Setting all sprite control outputs to zero
   io.spriteXPosition := Seq.fill(SpriteNumber)(0.S)
   io.spriteYPosition := Seq.fill(SpriteNumber)(0.S)
   io.spriteVisible := Seq.fill(SpriteNumber)(false.B)
@@ -69,11 +69,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.spriteScaleUpVertical := Seq.fill(SpriteNumber)(false.B)
   io.spriteScaleDownVertical := Seq.fill(SpriteNumber)(false.B)
 
-  //Viewbox
-  val viewBoxXReg = RegInit(0.U(10.W))
-  val viewBoxYReg = RegInit(0.U(9.W))
-  io.viewBoxX := viewBoxXReg
-  io.viewBoxY := viewBoxYReg
 
   //Setting sound engine outputs to zero
   io.startTune := Seq.fill(TuneNumber)(false.B)
@@ -119,7 +114,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // val block :: pipe :: sRight :: sLeft :: lRight :: lLeft :: t :: Nil = Enum(7)
   val sRight :: sLeft :: Nil = Enum(2)
   val blockType = io.sw(0)
-
   // Blockoffsets
   // s piece
   val sOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
@@ -135,7 +129,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //Rotation for current piece
   val rotation = RegInit(0.U(2.W))
   //Up input release detect.
-  val upRelease = true.B
+  val upRelease = RegInit(true.B)
+  //Screen control
+  val gameScreen = Module(new GameScreen)
+  gameScreen.io.sw := io.sw(7)
+  io.viewBoxX := gameScreen.io.viewBoxX
+  io.viewBoxY := gameScreen.io.viewBoxY
   // Set position of relevant sprites
   switch (blockType) {
     // Red

@@ -1,11 +1,11 @@
-[0m[[0m[31merror[0m] [0m[0mjava.lang.NullPointerException: Cannot invoke "PosToIndex.io()" because the return value of "GameLogic.posToIndex()" is null[0m
+[0m[[0m[31merror[0m] [0m[0mjava.lang.IndexOutOfBoundsException: 8 is out of bounds (min 0, max 7)[0m
 [0m[[0m[31merror[0m] [0m[0m	at ... ()[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameLogic.$anonfun$new$18(GameLogic.scala:92)[0m
+[0m[[0m[31merror[0m] [0m[0m	at GameLogic.$anonfun$new$21(GameLogic.scala:135)[0m
 [0m[[0m[31merror[0m] [0m[0m	at chisel3.Data.$anonfun$$colon$eq$1(Data.scala:724)[0m
 [0m[[0m[31merror[0m] [0m[0m	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)[0m
 [0m[[0m[31merror[0m] [0m[0m	at chisel3.experimental.prefix$.apply(prefix.scala:33)[0m
 [0m[[0m[31merror[0m] [0m[0m	at chisel3.Data.$colon$eq(Data.scala:724)[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameLogic.<init>(GameLogic.scala:92)[0m
+[0m[[0m[31merror[0m] [0m[0m	at GameLogic.<init>(GameLogic.scala:135)[0m
 [0m[[0m[31merror[0m] [0m[0m	at GameTop.$anonfun$gameLogic$2(GameTop.scala:53)[0m
 [0m[[0m[31merror[0m] [0m[0m	at chisel3.Module$.do_apply(Module.scala:53)[0m
 [0m[[0m[31merror[0m] [0m[0m	at GameTop.$anonfun$gameLogic$1(GameTop.scala:53)[0m
@@ -19,4 +19,4 @@
 [0m[[0m[31merror[0m] [0m[0m	at Top$.$anonfun$new$6(Top.scala:71)[0m
 [0m[[0m[31merror[0m] [0m[0m	at ... ()[0m
 [0m[[0m[31merror[0m] [0m[0m	at ... (Stack trace trimmed to user code only. Rerun with --full-stacktrace to see the full stack trace)[0m
-[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrun[0m) java.lang.NullPointerException: Cannot invoke "PosToIndex.io()" because the return value of "GameLogic.posToIndex()" is null[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrun[0m) java.lang.IndexOutOfBoundsException: 8 is out of bounds (min 0, max 7)[0m
