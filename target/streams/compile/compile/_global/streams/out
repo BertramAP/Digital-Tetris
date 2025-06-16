@@ -1,8 +1,13 @@
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:172:49: not found: value sRightOffset[0m
-[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.xPos := blockXReg + sRightOffset(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\GameLogic.scala:208:49: not found: value sRightOffsetX[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.xPos := blockXReg + sRightOffsetX(writingCount)[0m
 [0m[[0m[31merror[0m] [0m[0m                                                ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/main/scala/GameLogic.scala:177:29: value yPOs is not a member of chisel3.Bundle{val xPos: chisel3.SInt; val yPos: chisel3.SInt; val index: chisel3.UInt}[0m
-[0m[[0m[31merror[0m] [0m[0mdid you mean yPos? or perhaps xPos?[0m
-[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.yPOs := blockYReg + sLeftOffsetY(writingCount)[0m
-[0m[[0m[31merror[0m] [0m[0m                            ^[0m
-[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\GameLogic.scala:209:49: not found: value sRightOffsetY[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.yPos := blockYReg + sRightOffsetY(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\GameLogic.scala:213:49: not found: value sLeftOffsetX[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.xPos := blockXReg + sLeftOffsetX(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\GameLogic.scala:214:49: not found: value sLeftOffsetY[0m
+[0m[[0m[31merror[0m] [0m[0m              posToIndex.io.yPos := blockYReg + sLeftOffsetY(writingCount)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                ^[0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m
