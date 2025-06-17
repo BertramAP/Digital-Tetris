@@ -1,0 +1,7 @@
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTester.scala:36:23: ')' expected but integer literal found.[0m
+[0m[[0m[31merror[0m] [0m[0m      for (i <- until 4) {[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTester.scala:41:5: illegal start of simple expression[0m
+[0m[[0m[31merror[0m] [0m[0m    }[0m
+[0m[[0m[31merror[0m] [0m[0m    ^[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m

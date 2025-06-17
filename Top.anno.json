@@ -3,25 +3,55 @@
     "class":"firrtl.transforms.DedupedResult",
     "original":"~Top|RamSpWf",
     "duplicate":"~Top|Top/gameTop:GameTop/graphicEngineVGA:GraphicEngineVGA/backBufferMemory:Memory_32/ramsSpWf:RamSpWf",
-    "index":0.5714285714285714
+    "index":0.5423728813559322
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~Top|Memory_32",
     "duplicate":"~Top|Top/gameTop:GameTop/graphicEngineVGA:GraphicEngineVGA/backBufferMemory:Memory_32",
-    "index":0.5803571428571429
+    "index":0.5508474576271186
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~Top|RamSpWf_1",
     "duplicate":"~Top|Top/gameTop:GameTop/graphicEngineVGA:GraphicEngineVGA/backBufferShadowMemory:Memory_32/ramsSpWf:RamSpWf",
-    "index":0.5892857142857143
+    "index":0.559322033898305
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~Top|Memory_33",
     "duplicate":"~Top|Top/gameTop:GameTop/graphicEngineVGA:GraphicEngineVGA/backBufferShadowMemory:Memory_32",
-    "index":0.5982142857142857
+    "index":0.5677966101694916
+  },
+  {
+    "class":"firrtl.transforms.DedupedResult",
+    "original":"~Top|PosToGridIndex",
+    "duplicate":"~Top|Top/gameTop:GameTop/gameLogic:GameLogic/movementDetector:CollisionDetector/first:PosToGridIndex",
+    "index":0.923728813559322
+  },
+  {
+    "class":"firrtl.transforms.DedupedResult",
+    "original":"~Top|PosToGridIndex_1",
+    "duplicate":"~Top|Top/gameTop:GameTop/gameLogic:GameLogic/movementDetector:CollisionDetector/second:PosToGridIndex",
+    "index":0.9322033898305084
+  },
+  {
+    "class":"firrtl.transforms.DedupedResult",
+    "original":"~Top|PosToGridIndex_2",
+    "duplicate":"~Top|Top/gameTop:GameTop/gameLogic:GameLogic/movementDetector:CollisionDetector/third:PosToGridIndex",
+    "index":0.940677966101695
+  },
+  {
+    "class":"firrtl.transforms.DedupedResult",
+    "original":"~Top|PosToGridIndex_3",
+    "duplicate":"~Top|Top/gameTop:GameTop/gameLogic:GameLogic/movementDetector:CollisionDetector/fourth:PosToGridIndex",
+    "index":0.9491525423728814
+  },
+  {
+    "class":"firrtl.transforms.DedupedResult",
+    "original":"~Top|PosToGridIndex_4",
+    "duplicate":"~Top|Top/gameTop:GameTop/gameLogic:GameLogic/posToGridIndex:PosToGridIndex",
+    "index":0.9745762711864406
   },
   {
     "class":"firrtl.EmitCircuitAnnotation",

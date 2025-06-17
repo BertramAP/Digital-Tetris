@@ -87,10 +87,31 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val writingCount = RegInit(0.U(2.W))
   val enable = RegInit(false.B)
 
+  // Registers for storing all placed block
+  val grid = RegInit(VecInit(Seq.fill(300)(0.U(2.W))))
+
+  //Two registers holding the sprite sprite X and Y with the sprite initial position
+  val blockStartX = -4.S(11.W)
+  val blockStartY = 8.S(10.W)
+  val blockXReg = RegInit(blockStartX)
+  val blockYReg = RegInit(blockStartY)
+
+  // Collisiondetectors
+  val movementDetector = Module(new CollisionDetector)
+  movementDetector.io.grid := grid
+  movementDetector.io.xPos := blockXReg
+  movementDetector.io.yPos := blockYReg
+  movementDetector.io.xOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
+  movementDetector.io.yOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
+  val rotationDetector = Module(new CollisionDetector)
+
   // Modules
   val posToIndex = Module(new PosToIndex)
   posToIndex.io.xPos := 0.S
   posToIndex.io.yPos := 0.S
+  val posToGridIndex = Module(new PosToGridIndex)
+  posToGridIndex.io.xPos := 0.S(11.W)
+  posToGridIndex.io.yPos := 0.S(10.W)
 
   //Setting the background buffer outputs to zero
   io.backBufferWriteData := 0.U
@@ -103,12 +124,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // States
   val idle :: task :: compute1 :: done :: Nil = Enum(4)
   val stateReg = RegInit(idle)
-
-  //Two registers holding the sprite sprite X and Y with the sprite initial position
-  val blockStartX = -4.S(11.W)
-  val blockStartY = 8.S(10.W)
-  val blockXReg = RegInit(blockStartX)
-  val blockYReg = RegInit(blockStartY)
 
   // Sprite movement
   val scalaMaxCount = 60
@@ -135,6 +150,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //Movementspeed for block falling down
   val movementXspeed = RegInit(1.S(3.W))
 
+  // Debugging
+  io.led(0) := grid(9*20 + 17)(0)
+  io.led(1) := grid(10*20 + 17)(0)
+  io.led(2) := grid(10*20 + 18)(0)
+  io.led(3) := grid(11*20 + 18)(0)
+
   val rotation = RegInit(0.U(2.W))
   // Set position of relevant sprites
   switch (blockType) {
@@ -144,32 +165,14 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         for (i <- 0 until 4) {
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + sOffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + sOffsetY(i)) << 5 // klods til højre fra centrum?
-
-        } /*
-        io.spriteXPosition(0) := (blockXReg + sOffsetX(0)) << 5
-        io.spriteYPosition(0) := (blockYReg + sOffsetY(0)) << 5 // klods til højre fra centrum?
-        io.spriteXPosition(1) := (blockXReg + sOffsetX(1)) << 5
-        io.spriteYPosition(1) := (blockYReg + sOffsetY(1)) << 5 //Klodsens center?
-        io.spriteXPosition(2) := (blockXReg + sOffsetX(2)) << 5
-        io.spriteYPosition(2) := (blockYReg + sOffsetY(2)) << 5 //Klods under center
-        io.spriteXPosition(3) := (blockXReg + sOffsetX(3)) << 5
-        io.spriteYPosition(3) := (blockYReg + sOffsetY(3)) << 5 // Klods i nederst venstre hjørne? */
+          io.spriteYPosition(i) := (blockYReg + sOffsetY(i)) << 5
+        }
       }.otherwise {
         for (i <- 0 until 4) {
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + s2OffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + s2OffsetY(i)) << 5 // klods til højre fra centrum?
+          io.spriteYPosition(i) := (blockYReg + s2OffsetY(i)) << 5
         }
-        /*
-        io.spriteXPosition(0) := (blockXReg + s2OffsetX(0)) << 5
-        io.spriteYPosition(0) := (blockYReg + s2OffsetY(0)) << 5 // klods til højre fra centrum?
-        io.spriteXPosition(1) := (blockXReg + s2OffsetX(1)) << 5
-        io.spriteYPosition(1) := (blockYReg + s2OffsetY(1)) << 5 //Klodsens center
-        io.spriteXPosition(2) := (blockXReg + s2OffsetX(2)) << 5
-        io.spriteYPosition(2) := (blockYReg + s2OffsetY(2)) << 5 //klodsens top
-        io.spriteXPosition(3) := (blockXReg + s2OffsetX(3)) << 5
-        io.spriteYPosition(3) := (blockYReg + s2OffsetY(3)) << 5 //Klods nederst højre */
       }
     }
     // Green
@@ -179,15 +182,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           io.spriteVisible(i) := true.B
           io.spriteXPosition(i) := (blockXReg + zOffsetX(i-4)) << 5
           io.spriteYPosition(i) := (blockYReg + zOffsetY(i-4)) << 5
-        } /*
-        io.spriteXPosition(4) := (blockXReg + zOffsetX(0)) << 5
-        io.spriteYPosition(4) := (blockYReg + zOffsetY(0)) << 5
-        io.spriteXPosition(5) := (blockXReg + zOffsetX(1)) << 5
-        io.spriteYPosition(5) := (blockYReg + zOffsetY(1)) << 5
-        io.spriteXPosition(6) := (blockXReg + zOffsetX(2)) << 5
-        io.spriteYPosition(6) := (blockYReg + zOffsetY(2)) << 5
-        io.spriteXPosition(7) := (blockXReg + zOffsetX(3)) << 5
-        io.spriteYPosition(7) := (blockYReg + zOffsetY(3)) << 5 */
+        }
       }.otherwise {
         for (i <- 4 until 8) {
           io.spriteVisible(i) := true.B
@@ -213,11 +208,16 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           // Getting backbuffer address of current block
           switch (blockType) {
             is (false.B) {
+              posToGridIndex.io.xPos := blockXReg + sOffsetX(writingCount)
+              posToGridIndex.io.yPos := blockYReg + sOffsetY(writingCount)
               posToIndex.io.xPos := blockXReg + sOffsetX(writingCount)
               posToIndex.io.yPos := blockYReg + sOffsetY(writingCount)
+              grid(posToGridIndex.io.index) := 1.U
               io.backBufferWriteData := 21.U
             }
             is (true.B) {
+              posToGridIndex.io.xPos := blockXReg + zOffsetX(writingCount)
+              posToGridIndex.io.yPos := blockYReg + zOffsetY(writingCount)
               posToIndex.io.xPos := blockXReg + zOffsetX(writingCount)
               posToIndex.io.yPos := blockYReg + zOffsetY(writingCount)
               io.backBufferWriteData := 22.U
@@ -244,20 +244,32 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       when(moveCnt === maxCount - 1.U) {
         moveCnt := 0.U
         val newX = blockXReg + movementXspeed
-
-        // Collision with bottom on next cycle
-        when(newX > 16.S) {
+        
+        // Moving onto other block
+        switch (blockType) {
+          // Red s shape
+          is (false.B) {
+            movementDetector.io.xPos := newX
+            movementDetector.io.yPos := blockYReg
+            movementDetector.io.xOffsets := sOffsetX
+            movementDetector.io.yOffsets := sOffsetY
+          }
+        }
+        when (movementDetector.io.isCollision) {
           nextState := task
           currentTask := writingBlock
           enable := true.B
         }
-          .otherwise {
-            blockXReg := newX
-          }
-      }
-        .otherwise {
-          moveCnt := moveCnt + 1.U
+
+        // Collision with bottom on next cycle
+        .elsewhen(newX > 16.S) {
+          nextState := task
+          currentTask := writingBlock
+          enable := true.B
         }
+        .otherwise { blockXReg := newX }
+      }
+      .otherwise { moveCnt := moveCnt + 1.U }
 
       // Sideways movement
       when(io.btnL) {
@@ -282,7 +294,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
 
       stateReg := nextState
-
     }
     is(done) {
       io.frameUpdateDone := true.B

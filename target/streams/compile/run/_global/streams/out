@@ -1,22 +1,12 @@
-[0m[[0m[31merror[0m] [0m[0mjava.lang.NullPointerException: Cannot invoke "PosToIndex.io()" because the return value of "GameLogic.posToIndex()" is null[0m
-[0m[[0m[31merror[0m] [0m[0m	at ... ()[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameLogic.$anonfun$new$18(GameLogic.scala:92)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.Data.$anonfun$$colon$eq$1(Data.scala:724)[0m
-[0m[[0m[31merror[0m] [0m[0m	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.experimental.prefix$.apply(prefix.scala:33)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.Data.$colon$eq(Data.scala:724)[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameLogic.<init>(GameLogic.scala:92)[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameTop.$anonfun$gameLogic$2(GameTop.scala:53)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.Module$.do_apply(Module.scala:53)[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameTop.$anonfun$gameLogic$1(GameTop.scala:53)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.internal.plugin.package$.autoNameRecursively(package.scala:33)[0m
-[0m[[0m[31merror[0m] [0m[0m	at GameTop.<init>(GameTop.scala:53)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Top.$anonfun$gameTop$2(Top.scala:44)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.Module$.do_apply(Module.scala:53)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Top.$anonfun$gameTop$1(Top.scala:44)[0m
-[0m[[0m[31merror[0m] [0m[0m	at chisel3.internal.plugin.package$.autoNameRecursively(package.scala:33)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Top.<init>(Top.scala:44)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Top$.$anonfun$new$6(Top.scala:71)[0m
-[0m[[0m[31merror[0m] [0m[0m	at ... ()[0m
-[0m[[0m[31merror[0m] [0m[0m	at ... (Stack trace trimmed to user code only. Rerun with --full-stacktrace to see the full stack trace)[0m
-[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrun[0m) java.lang.NullPointerException: Cannot invoke "PosToIndex.io()" because the return value of "GameLogic.posToIndex()" is null[0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.PassExceptions: [0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.CheckInitialization$RefNotInitializedException:  @[src/main/scala/GameLogic.scala 109:30] : [module GameLogic]  Reference posToGridIndex is not fully initialized.[0m
+[0m[[0m[31merror[0m] [0m[0m   : posToGridIndex.io.xPos <= mux(_T_8, VOID, mux(_T_9, mux(_T_10, mux(_T_11, _posToGridIndex_io_xPos_T_2, mux(_T_13, _posToGridIndex_io_xPos_T_5, VOID)), VOID), VOID))[0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.CheckInitialization$RefNotInitializedException:  @[src/main/scala/GameLogic.scala 109:30] : [module GameLogic]  Reference posToGridIndex is not fully initialized.[0m
+[0m[[0m[31merror[0m] [0m[0m   : posToGridIndex.io.yPos <= mux(_T_8, VOID, mux(_T_9, mux(_T_10, mux(_T_11, _posToGridIndex_io_yPos_T_2, mux(_T_13, _posToGridIndex_io_yPos_T_5, VOID)), VOID), VOID))[0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.PassException: 2 errors detected![0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrun[0m) firrtl.passes.PassExceptions: [0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.CheckInitialization$RefNotInitializedException:  @[src/main/scala/GameLogic.scala 109:30] : [module GameLogic]  Reference posToGridIndex is not fully initialized.[0m
+[0m[[0m[31merror[0m] [0m[0m   : posToGridIndex.io.xPos <= mux(_T_8, VOID, mux(_T_9, mux(_T_10, mux(_T_11, _posToGridIndex_io_xPos_T_2, mux(_T_13, _posToGridIndex_io_xPos_T_5, VOID)), VOID), VOID))[0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.CheckInitialization$RefNotInitializedException:  @[src/main/scala/GameLogic.scala 109:30] : [module GameLogic]  Reference posToGridIndex is not fully initialized.[0m
+[0m[[0m[31merror[0m] [0m[0m   : posToGridIndex.io.yPos <= mux(_T_8, VOID, mux(_T_9, mux(_T_10, mux(_T_11, _posToGridIndex_io_yPos_T_2, mux(_T_13, _posToGridIndex_io_yPos_T_5, VOID)), VOID), VOID))[0m
+[0m[[0m[31merror[0m] [0m[0mfirrtl.passes.PassException: 2 errors detected![0m
