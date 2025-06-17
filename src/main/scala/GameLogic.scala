@@ -124,6 +124,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val maxCount = scalaMaxCount.U
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
   val realCnt = RegInit(0.U(6.W))
+  val maxCountFast = 60.U
   // Block registers
   // val block :: pipe :: sRight :: sLeft :: lRight :: lLeft :: t :: Nil = Enum(7)
   val sRight :: sLeft :: Nil = Enum(2)
@@ -192,8 +193,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //FSMD switch
   switch(stateReg) {
     is(idle) {
-      when(io.newFrame) {
+      when(io.newFrame && !gameScreen.io.staticScreen) {
         stateReg := compute1
+      }. elsewhen(gameScreen.io.staticScreen) {
+        stateReg := idle
       }
     }
     is (task) {
@@ -277,7 +280,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
       //Increase falling speed when pressing down, by halving the counter value
       when(io.btnD) {
-        realCnt := maxCount >> 1
+        realCnt := maxCountFast
       }.otherwise {
         realCnt := maxCount
       }

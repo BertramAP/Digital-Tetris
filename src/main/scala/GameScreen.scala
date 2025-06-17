@@ -11,7 +11,7 @@ class GameScreen() extends Module {
     //Viewbox control output
     val viewBoxX = Output(UInt(10.W)) //0 to 640
     val viewBoxY = Output(UInt(9.W)) //0 to 480
-
+    val staticScreen = Output(Bool())
   })
   //Viewbox
   val viewBoxXReg = RegInit(0.U(10.W))
@@ -21,6 +21,8 @@ class GameScreen() extends Module {
   //Screen states
   val start :: game :: over :: Nil = Enum(3)
   val currentScreen = RegInit(start)
+  val static = RegInit(true.B)
+  io.staticScreen := static
 
   //FSMD for gamescreens
   switch(currentScreen){
@@ -28,14 +30,17 @@ class GameScreen() extends Module {
       when(io.sw) {
         currentScreen := game
       }
+      static := true.B
       viewBoxXReg := 0.U
       viewBoxYReg := 480.U
     }
     is(game) {
       viewBoxXReg := 0.U
       viewBoxYReg := 0.U
+      static := false.B
     }
     is(over) {
+      static := true.B
       viewBoxXReg := 640.U
       viewBoxYReg := 480.U
     }

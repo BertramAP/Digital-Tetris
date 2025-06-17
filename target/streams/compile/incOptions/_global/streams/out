@@ -1,11 +1,90 @@
 [0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes.bak[0m
 [0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
 [0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
-[0m[[0m[0mdebug[0m] [0m[0m	GameLogic.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToGridIndex$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf$$anon$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SoundEngine$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	CollisionDetector$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToGridIndex.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MultiHotPriortyReductionTree$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameTop.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	CollisionDetector.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GraphicEngineVGA$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RegPipeline.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamInitSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory$$anon$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	GameLogic$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Memory.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RamSpWf.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Top$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PosToIndex.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameLogic.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GameScreen$$anon$1.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/magnusj/Desktop/Digital-Tetris/target/scala-2.13/classes.bak[0m
