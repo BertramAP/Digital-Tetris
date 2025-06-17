@@ -1,2 +1,9 @@
 *.fir
-*.v
+.v
+target/scala-2.13/classes/GameLogic.class
+target/scala-2.13/classes/GameScreen.class
+Top.anno.json
+target/scala-2.13/digital-tetris_2.13-0.1.0-SNAPSHOT.jar
+target/scala-2.13/zinc/inc_compile_2.13.zip
+target/streams/
+target/bg-jobs/*
