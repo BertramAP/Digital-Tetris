@@ -1,8 +1,7 @@
 import chisel3._
 import chisel3.util._
-import org.scalatest.CompositeStatus.Bundle
 
-class FibonnacciLFSR extends Module{
+class FibonacciLFSR extends Module{
   val io = IO(new Bundle{
     val seed = Input(UInt(3.W))
     val load = Input(Bool())

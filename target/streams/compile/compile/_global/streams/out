@@ -1,4 +1,4 @@
-[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\GameTop.scala:53:42: no arguments allowed for nullary constructor GameScreen: (): GameScreen[0m
-[0m[[0m[31merror[0m] [0m[0m  val gameScreen = Module(new GameScreen(SPRITE_NUMBER, BACK_TILE_NUMBER, TUNE_NUMBER))[0m
-[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\BDApo\OneDrive - Danmarks Tekniske Universitet\Digital systems design project\Digital-Tetris\src\main\scala\FibonacciLFSR.scala:3:22: object CompositeStatus in package scalatest cannot be accessed as a member of package org.scalatest from package <empty>[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.CompositeStatus.Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
 [0m[[0m[31merror[0m] [0m[0mone error found[0m

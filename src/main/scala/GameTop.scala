@@ -41,7 +41,7 @@ class GameTop extends Module {
     val soundOut = Output(Bool())
   })
 
-  val SPRITE_NUMBER = 16
+  val SPRITE_NUMBER = 32
   val BACK_TILE_NUMBER = 32
   val graphicEngineVGA = Module(new GraphicEngineVGA(SPRITE_NUMBER, BACK_TILE_NUMBER))
 
