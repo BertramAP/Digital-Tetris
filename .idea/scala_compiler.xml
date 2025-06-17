@@ -8,7 +8,7 @@
       <option name="uncheckedWarnings" value="true" />
       <option name="featureWarnings" value="true" />
       <plugins>
-        <plugin path="C:\Users\BDApo\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\edu\berkeley\cs\chisel3-plugin_2.13.14\3.6.1\chisel3-plugin_2.13.14-3.6.1.jar" />
+        <plugin path="C:\Users\Bertram\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\edu\berkeley\cs\chisel3-plugin_2.13.14\3.6.1\chisel3-plugin_2.13.14-3.6.1.jar" />
       </plugins>
     </profile>
   </component>
