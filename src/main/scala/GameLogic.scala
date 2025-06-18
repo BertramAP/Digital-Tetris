@@ -53,8 +53,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     val pauseTune = Output(Vec(TuneNumber, Bool()))
     val playingTune = Input(Vec(TuneNumber, Bool()))
     val tuneId = Output(UInt(log2Up(TuneNumber).W))
-
-    })
+  })
 
   // Setting all led outputs to zero
   io.led := Seq.fill(8)(false.B)
@@ -82,10 +81,31 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val writingCount = RegInit(0.U(2.W))
   val enable = RegInit(false.B)
 
+  // Registers for storing all placed block
+  val grid = RegInit(VecInit(Seq.fill(300)(0.U(2.W))))
+
+  //Two registers holding the sprite sprite X and Y with the sprite initial position
+  val blockStartX = -4.S(11.W)
+  val blockStartY = 8.S(10.W)
+  val blockXReg = RegInit(blockStartX)
+  val blockYReg = RegInit(blockStartY)
+
+  // Collisiondetectors
+  val movementDetector = Module(new CollisionDetector)
+  movementDetector.io.grid := grid
+  movementDetector.io.xPos := blockXReg
+  movementDetector.io.yPos := blockYReg
+  movementDetector.io.xOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
+  movementDetector.io.yOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
+  // val rotationDetector = Module(new CollisionDetector) WIP
+
   // Modules
   val posToIndex = Module(new PosToIndex)
   posToIndex.io.xPos := 0.S
   posToIndex.io.yPos := 0.S
+  val posToGridIndex = Module(new PosToGridIndex)
+  posToGridIndex.io.xPos := 0.S(11.W)
+  posToGridIndex.io.yPos := 0.S(10.W)
 
   //Setting the background buffer outputs to zero
   io.backBufferWriteData := 0.U
@@ -98,12 +118,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // States
   val idle :: task :: compute1 :: done :: Nil = Enum(4)
   val stateReg = RegInit(idle)
-
-  //Two registers holding the sprite sprite X and Y with the sprite initial position
-  val blockStartX = -4.S(11.W)
-  val blockStartY = 8.S(10.W)
-  val blockXReg = RegInit(blockStartX)
-  val blockYReg = RegInit(blockStartY)
 
   // Sprite movement
   val scalaMaxCount = 120
@@ -343,13 +357,15 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     is (task) {
       switch (currentTask) {
         is (writingBlock) {
-
           // Getting backbuffer address of current block
           switch (blockType) {
             is (false.B) {
               when(rotation === 0.U || rotation === 2.U) {
+                posToGridIndex.io.xPos := blockXReg + sOffsetX(writingCount)
+                posToGridIndex.io.yPos := blockYReg + sOffsetY(writingCount)
                 posToIndex.io.xPos := blockXReg + sOffsetX(writingCount)
                 posToIndex.io.yPos := blockYReg + sOffsetY(writingCount)
+                grid(posToGridIndex.io.index) := 1.U
                 io.backBufferWriteData := 21.U
               }.otherwise{
                 posToIndex.io.xPos := blockXReg + s2OffsetX(writingCount)
@@ -395,17 +411,32 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         moveCnt := 0.U
         val newX = blockXReg + 1.S
 
-        // Collision with bottom on next cycle
-        when(newX > 16.S) {
+        // Moving onto other block
+        switch (blockType) {
+          // Red s shape
+          is (false.B) {
+            movementDetector.io.xPos := newX
+            movementDetector.io.yPos := blockYReg
+            movementDetector.io.xOffsets := sOffsetX
+            movementDetector.io.yOffsets := sOffsetY
+          }
+        }
+        // Collision with other block
+        when (movementDetector.io.isCollision) {
           nextState := task
           currentTask := writingBlock
           enable := true.B
-        }.otherwise {
-            blockXReg := newX
         }
-      }.otherwise {
-          moveCnt := moveCnt + 1.U
+        // Collision with bottom on next cycle
+        .elsewhen(newX > 16.S) {
+          nextState := task
+          currentTask := writingBlock
+          enable := true.B
+        }
+        .otherwise { blockXReg := newX }
       }
+      .otherwise { moveCnt := moveCnt + 1.U }
+
       // Sideways movement
       when(io.btnL) {
         blockYReg := blockYReg + 1.S
