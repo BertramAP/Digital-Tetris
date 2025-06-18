@@ -58,9 +58,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // Setting all led outputs to zero
   io.led := Seq.fill(8)(false.B)
   //Setting all sprite control outputs to zero
-  io.spriteXPosition := Seq.fill(SpriteNumber)(0.S)
-  io.spriteYPosition := Seq.fill(SpriteNumber)(0.S)
-  io.spriteVisible := Seq.fill(SpriteNumber)(false.B)
   io.spriteFlipHorizontal := Seq.fill(SpriteNumber)(false.B)
   io.spriteFlipVertical := Seq.fill(SpriteNumber)(false.B)
   io.spriteScaleUpHorizontal := Seq.fill(SpriteNumber)(false.B)
@@ -125,52 +122,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
   val realCnt = RegInit(0.U(6.W))
   val maxCountFast = 60.U
-  // Blockoffsets
-  // s piece
-  val sOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
-  val sOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  val s2OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val s2OffsetY = VecInit(3.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  //z piece
-  val zOffsetX = VecInit(3.S(4.W), 3.S(4.W), 2.S(4.W), 2.S(4.W))
-  val zOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  val z2OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val z2OffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
-  //Square piece offset
-  val squareOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
-  val squareOffsetY = VecInit(1.S(4.W), 2.S(4.W), 1.S(4.W), 2.S(4.W))
-  //Pipe piece offset
-  val pipeOffsetX = VecInit(0.S(4.W), 1.S(4.W), 2.S(4.W), 3.S(4.W))
-  val pipeOffsetY = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 2.S(4.W))
-  val pipe1OffsetX = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 2.S(4.W))
-  val pipe1OffsetY = VecInit(0.S(4.W), 1.S(4.W), 2.S(4.W), 3.S(4.W))
-  //L to the right offset
-  val lRightOffsetX = VecInit(1.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
-  val lRightOffsetY = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
-  val lRight1OffsetX = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  val lRight1OffsetY = VecInit(1.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
-  val lRight2OffsetX = VecInit(1.S(4.W), 2.S(4.W), 3.S(4.W), 1.S(4.W))
-  val lRight2OffsetY = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  val lRight3OffsetX = VecInit(3.S(4.W), 3.S(4.W), 3.S(4.W), 2.S(4.W))
-  val lRight3OffsetY = VecInit(3.S(4.W), 2.S(4.W), 1.S(4.W), 1.S(4.W))
-  //L to the left offset
-  val lLeftOffsetX = VecInit(1.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
-  val lLeftOffsetY = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
-  val lLeft1OffsetX = VecInit(2.S(4.W), 3.S(4.W), 3.S(4.W), 3.S(4.W))
-  val lLeft1OffsetY = VecInit(3.S(4.W), 3.S(4.W), 2.S(4.W), 1.S(4.W))
-  val lLeft2OffsetX = VecInit(1.S(4.W), 2.S(4.W), 3.S(4.W), 1.S(4.W))
-  val lLeft2OffsetY = VecInit(2.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
-  val lLeft3OffsetX = VecInit(3.S(4.W), 2.S(4.W), 2.S(4.W), 2.S(4.W))
-  val lLeft3OffsetY = VecInit(1.S(4.W) ,1.S(4.W), 2.S(4.W), 3.S(4.W))
-  //TODO: T piece offset
-  val tOffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 2.S(4.W))
-  val tOffsetY = VecInit(3.S(4.W), 2.S(4.W),2.S(4.W),1.S(4.W))
-  val t1OffsetX = VecInit(2.S(4.W), 1.S(4.W), 2.S(4.W), 3.S(4.W))
-  val t1OffsetY = VecInit(2.S(4.W), 2.S(4.W),1.S(4.W), 2.S(4.W))
-  val t2OffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 2.S(4.W))
-  val t2OffsetY = VecInit(3.S(4.W), 2.S(4.W),2.S(4.W),1.S(4.W))
-  val t3OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val t3OffsetY = VecInit(3.S(4.W), 2.S(4.W),1.S(4.W), 2.S(4.W))
 
   //Rotation for current piece
   val rotation = RegInit(0.U(2.W))
@@ -185,166 +136,18 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val lfsr = Module(new FibonacciLFSR)
   lfsr.io.load := false.B  // Normal operation most of the time
   lfsr.io.seed := 0.U      // Seed value doesn't matter unless loading
-  // Block registers
-
-  // val block :: pipe :: sRight :: sLeft :: lRight :: lLeft :: t :: Nil = Enum(7)
-  val s :: z :: square :: pipe :: lRight :: lLeft :: t ::Nil = Enum(7)
   val blockType = RegInit(0.U(3.W))
   blockType := io.sw.asUInt(2,0)
-  // Set position of relevant sprites
-  switch (blockType) {
-    // Red
-    is(s) {
-      when(rotation === 0.U || rotation === 2.U) {
-        for (i <- 0 until 4) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + sOffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + sOffsetY(i)) << 5
-        }
-      }.otherwise {
-        for (i <- 0 until 4) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + s2OffsetX(i)) << 5
-          io.spriteYPosition(i) := (blockYReg + s2OffsetY(i)) << 5
-        }
-      }
-    }
-    // Green
-    is(z) {
-      when(rotation === 0.U || rotation === 2.U) {
-        for (i <- 4 until 8) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + zOffsetX(i-4)) << 5
-          io.spriteYPosition(i) := (blockYReg + zOffsetY(i-4)) << 5
-        }
-      }.otherwise {
-        for (i <- 4 until 8) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + z2OffsetX(i - 4)) << 5
-          io.spriteYPosition(i) := (blockYReg + z2OffsetY(i - 4)) << 5
-        }
-      }
-    }
-    is(square) {
-      for (i <- 8 until 12) {
-        io.spriteVisible(i) := true.B
-        io.spriteXPosition(i) := (blockXReg + squareOffsetX(i-8)) << 5
-        io.spriteYPosition(i) := (blockYReg + squareOffsetY(i-8)) << 5
-      }
-    }
-    is(pipe) {
-      when(rotation === 0.U || rotation === 2.U) {
-        for(i <- 12 until 16) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + pipeOffsetX(i-12)) << 5
-          io.spriteYPosition(i) := (blockYReg + pipeOffsetY(i-12)) << 5
-        }
-      }.otherwise {
-        for(i <- 12 until 16) {
-          io.spriteVisible(i) := true.B
-          io.spriteXPosition(i) := (blockXReg + pipe1OffsetX(i-12)) << 5
-          io.spriteYPosition(i) := (blockYReg + pipe1OffsetY(i-12)) << 5
-        }
-      }
-    }
-    is(lRight) {
-      switch(rotation){
-        is(0.U) {
-          for(i <- 16 until 20) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lRightOffsetX(i-16)) << 5
-            io.spriteYPosition(i) := (blockYReg + lRightOffsetY(i-16)) << 5
-          }
-        }
-        is(1.U) {
-          for(i <- 16 until 20) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lRight1OffsetX(i-16)) << 5
-            io.spriteYPosition(i) := (blockYReg + lRight1OffsetY(i-16)) << 5
-          }
-        }
-        is(2.U) {
-          for(i <- 16 until 20) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lRight2OffsetX(i-16)) << 5
-            io.spriteYPosition(i) := (blockYReg + lRight2OffsetY(i-16)) << 5
-          }
-        }
-        is(3.U) {
-          for(i <- 16 until 20) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lRight3OffsetX(i-16)) << 5
-            io.spriteYPosition(i) := (blockYReg + lRight3OffsetY(i-16)) << 5
-          }
-        }
-      }
-    }
-    is(lLeft) {
-      switch(rotation){
-        is(0.U) {
-          for(i <- 20 until 24) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lLeftOffsetX(i-20)) << 5
-            io.spriteYPosition(i) := (blockYReg + lLeftOffsetY(i-20)) << 5
-          }
-        }
-        is(1.U) {
-          for(i <- 20 until 24) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lLeft1OffsetX(i-20)) << 5
-            io.spriteYPosition(i) := (blockYReg + lLeft1OffsetY(i-20)) << 5
-          }
-        }
-        is(2.U) {
-          for(i <- 20 until 24) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lLeft2OffsetX(i-20)) << 5
-            io.spriteYPosition(i) := (blockYReg + lLeft2OffsetY(i-20)) << 5
-          }
-        }
-        is(3.U) {
-          for(i <- 20 until 24) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + lLeft3OffsetX(i-20)) << 5
-            io.spriteYPosition(i) := (blockYReg + lLeft3OffsetY(i-20)) << 5
-          }
-        }
-      }
-    }
-    is(t) {
-      switch(rotation) {
-        is(0.U) {
-          for(i <- 24 until 28) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + tOffsetX(i-24)) << 5
-            io.spriteYPosition(i) := (blockYReg + tOffsetY(i-24)) << 5
-          }
-        }
-        is(1.U) {
-          for(i <- 24 until 28) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + t1OffsetX(i-24)) << 5
-            io.spriteYPosition(i) := (blockYReg + t1OffsetY(i-24)) << 5
-          }
-        }
-        is(2.U) {
-          for(i <- 24 until 28) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + t2OffsetX(i-24)) << 5
-            io.spriteYPosition(i) := (blockYReg + t2OffsetY(i-24)) << 5
-          }
-        }
-        is(3.U) {
-          for(i <- 24 until 28) {
-            io.spriteVisible(i) := true.B
-            io.spriteXPosition(i) := (blockXReg + t3OffsetX(i-24)) << 5
-            io.spriteYPosition(i) := (blockYReg + t3OffsetY(i-24)) << 5
-          }
-        }
-      }
-    }
-  }
-
+  val blockLogic = Module(new BlockLogic(SpriteNumber))
+  blockLogic.io.xPos := blockXReg
+  blockLogic.io.yPos := blockYReg
+  blockLogic.io.rotation := rotation
+  blockLogic.io.sel := blockType
+  io.spriteVisible := blockLogic.io.spriteVisible
+  io.spriteXPosition := blockLogic.io.spriteXPosition
+  io.spriteYPosition := blockLogic.io.spriteYPosition
+  //Offset module
+  val offSets = Module(new OffSets)
   //FSMD switch
   switch(stateReg) {
     is(idle) {
@@ -359,28 +162,28 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         is (writingBlock) {
           // Getting backbuffer address of current block
           switch (blockType) {
-            is (false.B) {
+            is (0.U) {
               when(rotation === 0.U || rotation === 2.U) {
-                posToGridIndex.io.xPos := blockXReg + sOffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + sOffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + sOffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + sOffsetY(writingCount)
+                posToGridIndex.io.xPos := blockXReg + offSets.io.sOffsetX(writingCount)
+                posToGridIndex.io.yPos := blockYReg + offSets.io.sOffsetY(writingCount)
+                posToIndex.io.xPos := blockXReg + offSets.io.sOffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + offSets.io.sOffsetY(writingCount)
                 grid(posToGridIndex.io.index) := 1.U
                 io.backBufferWriteData := 21.U
               }.otherwise{
-                posToIndex.io.xPos := blockXReg + s2OffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + s2OffsetY(writingCount)
+                posToIndex.io.xPos := blockXReg + offSets.io.s1OffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + offSets.io.s1OffsetY(writingCount)
                 io.backBufferWriteData := 21.U
               }
             }
-            is (true.B) {
+            is (1.U) {
               when(rotation === 0.U || rotation === 2.U) {
-                posToIndex.io.xPos := blockXReg + zOffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + zOffsetY(writingCount)
+                posToIndex.io.xPos := blockXReg + offSets.io.zOffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + offSets.io.zOffsetY(writingCount)
                 io.backBufferWriteData := 22.U
               }.otherwise {
-                posToIndex.io.xPos := blockXReg + z2OffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + z2OffsetY(writingCount)
+                posToIndex.io.xPos := blockXReg + offSets.io.z1OffsetX(writingCount)
+                posToIndex.io.yPos := blockYReg + offSets.io.z1OffsetY(writingCount)
                 io.backBufferWriteData := 22.U
               }
             }
@@ -417,8 +220,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           is (false.B) {
             movementDetector.io.xPos := newX
             movementDetector.io.yPos := blockYReg
-            movementDetector.io.xOffsets := sOffsetX
-            movementDetector.io.yOffsets := sOffsetY
+            movementDetector.io.xOffsets := offSets.io.sOffsetX
+            movementDetector.io.yOffsets := offSets.io.sOffsetY
           }
         }
         // Collision with other block
