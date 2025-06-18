@@ -7,6 +7,7 @@
 
 import chisel3._
 import chisel3.util._
+import chisel3.util.random._
 
 class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends Module {
   val io = IO(new Bundle {
@@ -133,11 +134,21 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.viewBoxX := gameScreen.io.viewBoxX
   io.viewBoxY := gameScreen.io.viewBoxY
   //LSFR to generate random tetris pieces
-  val lfsr = Module(new FibonacciLFSR)
-  lfsr.io.load := false.B  // Normal operation most of the time
-  lfsr.io.seed := 0.U      // Seed value doesn't matter unless loading
-  val blockType = RegInit(0.U(3.W))
-  blockType := io.sw.asUInt(2,0)
+
+
+
+  //val lfsr = Module(new FibonacciLFSR)
+
+  val blockType = RegInit(LFSR(3, seed=Some(1)))
+
+
+  val rndEnable = WireInit(false.B)
+  rndEnable := false.B
+  val rnd = LFSR(3, increment = rndEnable, seed = Some(1))
+  blockType := rnd(2,0)
+
+  //blockType := io.sw.asUInt(2,0)
+
   val blockLogic = Module(new BlockLogic(SpriteNumber))
   blockLogic.io.xPos := blockXReg
   blockLogic.io.yPos := blockYReg
@@ -187,6 +198,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
                 io.backBufferWriteData := 22.U
               }
             }
+            is(2.U) {
+              posToIndex.io.xPos := blockXReg + offSets.io.squareOffsetX(writingCount)
+              posToIndex.io.yPos := blockYReg + offSets.io.squareOffsetY(writingCount)
+              io.backBufferWriteData := 23.U
+            }
           }
           when (writingCount === 3.U) {
             writingCount := 0.U
@@ -201,6 +217,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     }
     //Movement compute state
     is(compute1) {
+      rndEnable := true.B
       val nextState = WireInit(done)
 
       //Increase falling speed when pressing down, by halving the counter value
@@ -213,11 +230,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       when(moveCnt === realCnt) {
         moveCnt := 0.U
         val newX = blockXReg + 1.S
-
         // Moving onto other block
         switch (blockType) {
           // Red s shape
-          is (false.B) {
+          is (0.U) {
             movementDetector.io.xPos := newX
             movementDetector.io.yPos := blockYReg
             movementDetector.io.xOffsets := offSets.io.sOffsetX
@@ -229,12 +245,14 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           nextState := task
           currentTask := writingBlock
           enable := true.B
+          //blockType := lfsr.io.out
         }
         // Collision with bottom on next cycle
         .elsewhen(newX > 16.S) {
           nextState := task
           currentTask := writingBlock
           enable := true.B
+          //blockType := lfsr.io.out
         }
         .otherwise { blockXReg := newX }
       }

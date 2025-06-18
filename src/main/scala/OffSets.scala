@@ -52,12 +52,12 @@ class OffSets extends Module{
   val sOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
   val sOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
   val s1OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val s1OffsetY = VecInit(3.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
+  val s1OffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
   //z piece
   val zOffsetX = VecInit(3.S(4.W), 3.S(4.W), 2.S(4.W), 2.S(4.W))
   val zOffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
   val z1OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val z1OffsetY = VecInit(1.S(4.W), 2.S(4.W), 2.S(4.W), 1.S(4.W))
+  val z1OffsetY = VecInit(3.S(4.W), 2.S(4.W), 2.S(4.W), 3.S(4.W))
   //Square piece offset
   val squareOffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 3.S(4.W))
   val squareOffsetY = VecInit(1.S(4.W), 2.S(4.W), 1.S(4.W), 2.S(4.W))
@@ -92,7 +92,7 @@ class OffSets extends Module{
   val t2OffsetX = VecInit(2.S(4.W), 2.S(4.W), 3.S(4.W), 2.S(4.W))
   val t2OffsetY = VecInit(3.S(4.W), 2.S(4.W),2.S(4.W),1.S(4.W))
   val t3OffsetX = VecInit(2.S(4.W), 2.S(4.W), 1.S(4.W), 3.S(4.W))
-  val t3OffsetY = VecInit(3.S(4.W), 2.S(4.W),1.S(4.W), 2.S(4.W))
+  val t3OffsetY = VecInit(3.S(4.W), 2.S(4.W),2.S(4.W), 2.S(4.W))
 
   io.sOffsetX := sOffsetX
   io.sOffsetY := sOffsetY

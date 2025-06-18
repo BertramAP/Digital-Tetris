@@ -19,10 +19,8 @@ class BlockLogic(SpriteNumber: Int) extends Module {
   val offSets = Module(new OffSets)
   // Block registers
   val s :: z :: square :: pipe :: lRight :: lLeft :: t ::Nil = Enum(7)
-  val blockType = RegInit(0.U(3.W))
-  blockType := io.sel
   // Set position of relevant sprites
-  switch (blockType) {
+  switch (io.sel) {
     // Red
     is(s) {
       when(io.rotation === 0.U || io.rotation === 2.U) {
@@ -55,6 +53,7 @@ class BlockLogic(SpriteNumber: Int) extends Module {
         }
       }
     }
+    //Yellow
     is(square) {
       for (i <- 8 until 12) {
         io.spriteVisible(i) := true.B
@@ -62,6 +61,7 @@ class BlockLogic(SpriteNumber: Int) extends Module {
         io.spriteYPosition(i) := (io.yPos + offSets.io.squareOffsetY(i-8)) << 5
       }
     }
+    //blue
     is(pipe) {
       when(io.rotation === 0.U || io.rotation === 2.U) {
         for(i <- 12 until 16) {
@@ -77,6 +77,7 @@ class BlockLogic(SpriteNumber: Int) extends Module {
         }
       }
     }
+    //Pink
     is(lRight) {
       switch(io.rotation){
         is(0.U) {
