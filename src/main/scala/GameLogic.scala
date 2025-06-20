@@ -115,7 +115,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   movementDetector.io.yPos := blockYReg
   movementDetector.io.xOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
   movementDetector.io.yOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
-  // val rotationDetector = Module(new CollisionDetector) WIP
 
   // Modules
   val posToIndex = Module(new PosToIndex)
@@ -178,6 +177,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //speed mux
   val speedThreshold = RegInit(maxCount)
   speedThreshold := Mux(io.btnD, maxCountFast, maxCount)
+  io.led(0) := grid(25*1+21)
+  io.led(1) := grid(25*1+22)
+  io.led(2) := grid(25*1+23)
+  io.led(3) := grid(25*2+23)
 
   //FSMD switch
   switch(stateReg) {
@@ -193,157 +196,13 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       switch(currentTask) {
         is(writingBlock) {
           io.backBufferWriteEnable := true.B
-          switch(blockType-1.U) {
-            is(0.U) { // s piece / red
-              when(rotation === 0.U || rotation === 2.U) {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.sOffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.sOffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.sOffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.sOffsetY(writingCount)
-                grid(posToGridIndex.io.index) := 1.U
-                io.backBufferWriteData := 21.U
-              }.otherwise {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.s1OffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.s1OffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.s1OffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.s1OffsetY(writingCount)
-                io.backBufferWriteData := 21.U
-              }
-            }
-            is(1.U) { //z piece / green
-              when(rotation === 0.U || rotation === 2.U) {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.zOffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.zOffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.zOffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.zOffsetY(writingCount)
-                io.backBufferWriteData := 22.U
-              }.otherwise {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.z1OffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.z1OffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.z1OffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.z1OffsetY(writingCount)
-                io.backBufferWriteData := 22.U
-              }
-            }
-            is(2.U) { //square piece / yellow
-              posToGridIndex.io.xPos := blockXReg + offSets.io.squareOffsetX(writingCount)
-              posToGridIndex.io.yPos := blockYReg + offSets.io.squareOffsetY(writingCount)
-              posToIndex.io.xPos := blockXReg + offSets.io.squareOffsetX(writingCount)
-              posToIndex.io.yPos := blockYReg + offSets.io.squareOffsetY(writingCount)
-              io.backBufferWriteData := 23.U
-            }
-            is(3.U) {
-              when(rotation === 0.U || rotation === 2.U) {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.pipeOffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.pipeOffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.pipeOffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.pipeOffsetY(writingCount)
-                io.backBufferWriteData := 24.U
-              }.otherwise {
-                posToGridIndex.io.xPos := blockXReg + offSets.io.pipe1OffsetX(writingCount)
-                posToGridIndex.io.yPos := blockYReg + offSets.io.pipe1OffsetY(writingCount)
-                posToIndex.io.xPos := blockXReg + offSets.io.pipe1OffsetX(writingCount)
-                posToIndex.io.yPos := blockYReg + offSets.io.pipe1OffsetY(writingCount)
-                io.backBufferWriteData := 24.U
-              }
-            }
-            is(4.U) {
-              switch(rotation) {
-                is(0.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lRightOffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lRightOffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lRightOffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lRightOffsetY(writingCount)
-                  io.backBufferWriteData := 25.U
-                }
-                is(1.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lRight1OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lRight1OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lRight1OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lRight1OffsetY(writingCount)
-                  io.backBufferWriteData := 25.U
-                }
-                is(2.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lRight2OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lRight2OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lRight2OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lRight2OffsetY(writingCount)
-                  io.backBufferWriteData := 25.U
-                }
-                is(3.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lRight3OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lRight3OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lRight3OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lRight3OffsetY(writingCount)
-                  io.backBufferWriteData := 25.U
-                }
-              }
-            }
-            is(5.U) {
-              switch(rotation) {
-                is(0.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lLeftOffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lLeftOffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lLeftOffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lLeftOffsetY(writingCount)
-                  io.backBufferWriteData := 26.U
-                }
-                is(1.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lLeft1OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lLeft1OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lLeft1OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lLeft1OffsetY(writingCount)
-                  io.backBufferWriteData := 26.U
-                }
-                is(2.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lLeft2OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lLeft2OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lLeft2OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lLeft2OffsetY(writingCount)
-                  io.backBufferWriteData := 26.U
-                }
-                is(3.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.lLeft3OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.lLeft3OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.lLeft3OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.lLeft3OffsetY(writingCount)
-                  io.backBufferWriteData := 26.U
-                }
-              }
-            }
-            is(6.U) {
-              switch(rotation) {
-                is(0.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.tOffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.tOffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.tOffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.tOffsetY(writingCount)
-                  io.backBufferWriteData := 27.U
-                }
-                is(1.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.t1OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.t1OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.t1OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.t1OffsetY(writingCount)
-                  io.backBufferWriteData := 27.U
-                }
-                is(2.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.t2OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.t2OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.t2OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.t2OffsetY(writingCount)
-                  io.backBufferWriteData := 27.U
-                }
-                is(3.U) {
-                  posToGridIndex.io.xPos := blockXReg + offSets.io.t3OffsetX(writingCount)
-                  posToGridIndex.io.yPos := blockYReg + offSets.io.t3OffsetY(writingCount)
-                  posToIndex.io.xPos := blockXReg + offSets.io.t3OffsetX(writingCount)
-                  posToIndex.io.yPos := blockYReg + offSets.io.t3OffsetY(writingCount)
-                  io.backBufferWriteData := 27.U
-                }
-              }
-            }
-          }
+          posToGridIndex.io.xPos := blockXReg + blockLogic.io.activeOffsetX(writingCount)
+          posToGridIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
+          posToIndex.io.xPos := blockXReg + blockLogic.io.activeOffsetX(writingCount)
+          posToIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
+          grid(posToGridIndex.io.index) := 20.U - blockLogic.io.tileNumber
+          io.backBufferWriteData := blockLogic.io.tileNumber
+
           when(writingCount === 3.U) {
             writingCount := 0.U
             blockXReg := blockStartX
@@ -418,8 +277,14 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       when (!movementDetector.io.isCollision) {
         blockXReg := movedX
         blockYReg := movedY
-      }
-      .elsewhen (!fallDetector.io.isCollision) {
+        when(io.btnU && upRelease && rotation === 3.U) {
+          rotation := 0.U
+          false.B
+        } .elsewhen(io.btnU && upRelease) {
+          rotation := rotation + 1.U
+          upRelease := false.B
+        }. otherwise {upRelease := true.B}
+      }.elsewhen (!fallDetector.io.isCollision) {
         blockXReg := fallenX
         blockYReg := fallenY
       }
@@ -429,15 +294,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
 
       // Connecting offsets to collison detector
-      switch (blockType) {
-        is (0.U) {
-          fallDetector.io.xOffsets := offSets.io.sOffsetX
-          fallDetector.io.yOffsets := offSets.io.sOffsetY
-          movementDetector.io.xOffsets := offSets.io.sOffsetX // This should use rotated offsets
-          movementDetector.io.yOffsets := offSets.io.sOffsetY // This should use rotated offsets
-        }
-      }
-
+      fallDetector.io.xOffsets := blockLogic.io.activeOffsetX
+      fallDetector.io.yOffsets := blockLogic.io.activeOffsetY
+      movementDetector.io.xOffsets := blockLogic.io.activeOffsetX // This should use rotated offsets
+      movementDetector.io.yOffsets := blockLogic.io.activeOffsetY // This should use rotated offsets
       // Clearing bottom line (WIP)
       /*
       when (io.btnD) {
@@ -447,16 +307,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }*/
 
       //Rotates tetris piece on up input
-      when(io.btnU && upRelease) {
-        when(rotation === 3.U) {
-          rotation := 0.U
-        }.otherwise {
-            rotation := rotation + 1.U
-        }
-        upRelease := false.B
-      }. elsewhen(!io.btnU) {
-        upRelease := true.B
+      when(io.btnU) {
+        movementDetector.io.xOffsets := blockLogic.io.nextOffsetX // This should use rotated offsets
+        movementDetector.io.yOffsets := blockLogic.io.nextOffsetY // This should use rotated offsets
       }
+
       stateReg := nextState
     }
     is(done) {
