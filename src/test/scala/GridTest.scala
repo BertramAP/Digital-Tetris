@@ -2,25 +2,23 @@
 // Authors: Magnus Jacobsen
 // Copyright: Technical University of Denmark - 2025
 // Comments:
-// The tester for grid conversion logic
+// The tester for collision
 //////////////////////////////////////////////////////////////////////////////
 
 import chisel3._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
-class GridTester extends AnyFlatSpec with ChiselScalatestTester {
-
-  "GridTester" should "pass" in {
+class GridTest extends AnyFlatSpec with ChiselScalatestTester {
+  "GridTest" should "pass" in {
     test(new PosToGridIndex) { dut =>
-      println("Running the grid index tester")
-      dut.io.xPos.poke(19.S(11.W))
-      dut.io.yPos.poke(14.S(10.W))
+      dut.io.xPos.poke(-4.S)
+      dut.io.yPos.poke(4.S)
+      dut.io.index.expect(0.U)
+
+      dut.io.xPos.poke(20.S)
+      dut.io.yPos.poke(15.S)
       dut.io.index.expect(299.U)
-      dut.io.xPos.poke(15.S(11.W))
-      dut.io.yPos.poke(8.S(10.W))
-      dut.io.index.expect((8*20 + 15).U)
-      println("End of grid index tester")
     }
   }
 }

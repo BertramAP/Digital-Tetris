@@ -1,7 +1,17 @@
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTester.scala:36:23: ')' expected but integer literal found.[0m
-[0m[[0m[31merror[0m] [0m[0m      for (i <- until 4) {[0m
-[0m[[0m[31merror[0m] [0m[0m                      ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTester.scala:41:5: illegal start of simple expression[0m
-[0m[[0m[31merror[0m] [0m[0m    }[0m
-[0m[[0m[31merror[0m] [0m[0m    ^[0m
-[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTest.scala:51:14: value isCollisionDetails is not a member of chisel3.Bundle{val grid: chisel3.Vec[chisel3.UInt]; val xPos: chisel3.SInt; val yPos: chisel3.SInt; val xOffsets: chisel3.Vec[chisel3.SInt]; val yOffsets: chisel3.Vec[chisel3.SInt]; val isCollision: chisel3.Bool; val collisionDetails: chisel3.Vec[chisel3.Bool]}[0m
+[0m[[0m[31merror[0m] [0m[0mdid you mean collisionDetails?[0m
+[0m[[0m[31merror[0m] [0m[0m      dut.io.isCollisionDetails(0).expect(true.B)[0m
+[0m[[0m[31merror[0m] [0m[0m             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTest.scala:52:14: value isCollisionDetails is not a member of chisel3.Bundle{val grid: chisel3.Vec[chisel3.UInt]; val xPos: chisel3.SInt; val yPos: chisel3.SInt; val xOffsets: chisel3.Vec[chisel3.SInt]; val yOffsets: chisel3.Vec[chisel3.SInt]; val isCollision: chisel3.Bool; val collisionDetails: chisel3.Vec[chisel3.Bool]}[0m
+[0m[[0m[31merror[0m] [0m[0mdid you mean collisionDetails?[0m
+[0m[[0m[31merror[0m] [0m[0m      dut.io.isCollisionDetails(1).expect(false.B)[0m
+[0m[[0m[31merror[0m] [0m[0m             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTest.scala:53:14: value isCollisionDetails is not a member of chisel3.Bundle{val grid: chisel3.Vec[chisel3.UInt]; val xPos: chisel3.SInt; val yPos: chisel3.SInt; val xOffsets: chisel3.Vec[chisel3.SInt]; val yOffsets: chisel3.Vec[chisel3.SInt]; val isCollision: chisel3.Bool; val collisionDetails: chisel3.Vec[chisel3.Bool]}[0m
+[0m[[0m[31merror[0m] [0m[0mdid you mean collisionDetails?[0m
+[0m[[0m[31merror[0m] [0m[0m      dut.io.isCollisionDetails(2).expect(false.B)[0m
+[0m[[0m[31merror[0m] [0m[0m             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/magnusj/Desktop/Digital-Tetris/src/test/scala/CollisionTest.scala:54:14: value isCollisionDetails is not a member of chisel3.Bundle{val grid: chisel3.Vec[chisel3.UInt]; val xPos: chisel3.SInt; val yPos: chisel3.SInt; val xOffsets: chisel3.Vec[chisel3.SInt]; val yOffsets: chisel3.Vec[chisel3.SInt]; val isCollision: chisel3.Bool; val collisionDetails: chisel3.Vec[chisel3.Bool]}[0m
+[0m[[0m[31merror[0m] [0m[0mdid you mean collisionDetails?[0m
+[0m[[0m[31merror[0m] [0m[0m      dut.io.isCollisionDetails(3).expect(false.B)[0m
+[0m[[0m[31merror[0m] [0m[0m             ^[0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m

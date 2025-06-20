@@ -15,5 +15,5 @@ class PosToGridIndex extends Module {
     val index = Output(UInt(log2Up(300).W))
   })
 
-  io.index := io.yPos.asUInt * 20.U + io.xPos.asUInt
+  io.index := (io.yPos - 4.S).asUInt * 25.U + (io.xPos + 4.S).asUInt
 }
