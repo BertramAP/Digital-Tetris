@@ -50,6 +50,17 @@ number A?
 ![img.png](images/tile21.png)
 ## Tile 22
 ![img.png](images/tile22.png)
+## Tile 23
+
+## Tile 24 and sprite 12-15
+
+![img.png](images/blueBlock.png)
+## Tile 25 and sprite 16-19
+![img.png](images/orangeBlock.png)
+## Tile 26 and spirte 20-23
+![img.png](images/pinkBlock.png)
+## Tile 27 sprite 24-27
+![img.png](images/purpleBlock.png)
 ## Tile 29
 ![img.png](images/tile29.png)
 ## Tile 30
