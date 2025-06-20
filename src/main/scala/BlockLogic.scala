@@ -120,7 +120,6 @@ class BlockLogic(SpriteNumber: Int) extends Module {
         io.activeOffsetY := offSets.io.pipe1OffsetY
         io.nextOffsetX := offSets.io.pipeOffsetX
         io.nextOffsetY := offSets.io.pipeOffsetY
-
       }
       io.tileNumber := 24.U
     }

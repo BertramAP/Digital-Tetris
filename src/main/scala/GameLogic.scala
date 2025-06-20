@@ -200,7 +200,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           posToGridIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
           posToIndex.io.xPos := blockXReg + blockLogic.io.activeOffsetX(writingCount)
           posToIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
-          grid(posToGridIndex.io.index) := 20.U - blockLogic.io.tileNumber
+          grid(posToGridIndex.io.index) := blockLogic.io.tileNumber - 20.U
           io.backBufferWriteData := blockLogic.io.tileNumber
 
           when(writingCount === 3.U) {
@@ -279,11 +279,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         blockYReg := movedY
         when(io.btnU && upRelease && rotation === 3.U) {
           rotation := 0.U
-          false.B
+          upRelease:= false.B
         } .elsewhen(io.btnU && upRelease) {
           rotation := rotation + 1.U
           upRelease := false.B
-        }. otherwise {upRelease := true.B}
+        }. elsewhen(!io.btnU) {upRelease := true.B}
       }.elsewhen (!fallDetector.io.isCollision) {
         blockXReg := fallenX
         blockYReg := fallenY

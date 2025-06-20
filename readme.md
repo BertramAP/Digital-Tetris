@@ -3,6 +3,9 @@ Start screen by having the viewbox a different location. \
 The grid array contains 2 bits, where 00 is empty and then 01 can be the color red. \
 Make a better sprite for number 1. \
 When clearing lines, make the camera shake a little by changing the viewbox.
+Fixes to 4x1 piece not colliding staticly: \
+Check if the value 4(100) makes an error by switching the state values \
+Check if the state register is 3 bits wide. 
 ## Tile numbers
 ## Tile 0
 ![img.png](images/Background.png)
