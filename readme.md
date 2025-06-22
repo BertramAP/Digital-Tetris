@@ -6,6 +6,9 @@ When clearing lines, make the camera shake a little by changing the viewbox.
 Fixes to 4x1 piece not colliding staticly: \
 Check if the value 4(100) makes an error by switching the state values \
 Check if the state register is 3 bits wide. 
+
+Score registers need to be 16 bit wide
+![img_1.png](images/scoresystem.png) 
 ## Tile numbers
 ## Tile 0
 ![img.png](images/Background.png)
@@ -70,4 +73,4 @@ Check if the state register is 3 bits wide.
 ## Tile 30
 ![img.png](images/letterA.png)
 ## Tile 31
-![img.png](img.png)
+![img.png](images/letterM.png)
