@@ -76,16 +76,29 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.startTune(0) := false.B
 
   // For writing to background
-  val nothing :: writingBlock :: copyingLine :: Nil = Enum(3)
+  val nothing :: writingBlock :: copyingLine :: flashStart :: Nil = Enum(4)
   val currentTask = RegInit(nothing)
   val writingCount = RegInit(0.U(2.W))
-  // For copying
-  val currentLine = RegInit(0.U(log2Up(20).W)) // From top
-  val currentBlock = RegInit(0.U(log2Up(10).W)) // From right
-  val lineOffsets = VecInit(Seq(100.U, 120.U, 140.U, 160.U, 180.U, 200.U, 220.U, 240.U, 260.U, 280.U)) // What index on the grid each vertical line starts at in the grid
+  // For line clearing
+  val currentLine = RegInit(0.S(11.W)) // From top
+  val currentBlock = RegInit(5.S(10.W)) // From right
+  val continueOnNextLine = RegInit(false.B)
+  val blocksInLine = RegInit(VecInit(Seq.tabulate(20) { i =>
+   if (i >= 16) 9.U(5.W) else 0.U(5.W)
+  }))
+  val linesToClearCount = RegInit(0.U(3.W))
+  val linesToClear = RegInit(VecInit(Seq.fill(4)(0.S(6.W))))
 
   // Registers for storing all placed blocks
-  val grid = RegInit(VecInit(Seq.fill(300)(0.U(2.W)))) // Block position can be between x = 2, x = 14
+  /*val grid = RegInit(VecInit(Seq.tabulate(300) { i =>
+    if ((0 until 10).exists(j => i == j * 25 + 23)) 1.U(3.W) 
+    else 0.U(3.W)
+  }))*/
+  val grid = RegInit(VecInit.tabulate(300) { i =>
+    val mod25 = i % 25  // Check position within each 25-element block
+    if ((0 until 10).contains(i / 25) && (20 to 23).contains(mod25)) 1.U(3.W) 
+    else 0.U(3.W)
+  })
   // Setting bottom of screen
   for (i <- 0 until 12) {
     grid(i * 25 + 24) := 1.U
@@ -137,7 +150,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val stateReg = RegInit(idle)
 
   // Sprite movement
-  val scalaMaxCount = 120
+  val scalaMaxCount = 30
   val maxCount = scalaMaxCount.U
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
   val realCnt = RegInit(0.U(6.W))
@@ -147,6 +160,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val rotation = RegInit(0.U(2.W))
   //Up input release detect.
   val upRelease = RegInit(true.B)
+  val downReleased = RegInit(true.B)
   //Screen control
   val gameScreen = Module(new GameScreen)
   gameScreen.io.sw := io.sw(7)
@@ -154,7 +168,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.viewBoxY := gameScreen.io.viewBoxY
   
   //LSFR to generate random tetris pieces
-  val blockType = RegInit(LFSR(3, seed=Some(1)))
+  val blockType = RegInit(3.U(3.W)) // RegInit(LFSR(3, seed=Some(1)) - 1.U)
 
 
   val rndEnable = WireInit(false.B)
@@ -177,18 +191,29 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //speed mux
   val speedThreshold = RegInit(maxCount)
   speedThreshold := Mux(io.btnD, maxCountFast, maxCount)
-  io.led(0) := grid(25*1+21)
-  io.led(1) := grid(25*1+22)
-  io.led(2) := grid(25*1+23)
-  io.led(3) := grid(25*2+23)
 
+  val testReg = RegInit(false.B)
+  testReg := Mux(testReg > linesToClearCount, linesToClearCount, testReg)
+  val testReg2 = RegInit(false.B)
+  io.led(0) := blocksInLine(19)(0)
+  io.led(1) := blocksInLine(19)(1)
+  io.led(2) := blocksInLine(19)(2)
+  io.led(3) := blocksInLine(19)(3)
+  io.led(4) := blocksInLine(19)(4)
+  io.led(5) := testReg
+  io.led(6) := testReg2
+
+  val startShow = RegInit(true.B)
+  val blkCnt = RegInit(0.U(6.W))
+  val startTileCnt = RegInit(0.U(4.W))
   //FSMD switch
   switch(stateReg) {
     is(idle) {
       when(io.newFrame && !gameScreen.io.staticScreen) {
         stateReg := compute1
       }. elsewhen(gameScreen.io.staticScreen) {
-        stateReg := idle
+        stateReg := task
+        currentTask := flashStart
       }
       rndEnable := false.B
     }
@@ -196,43 +221,137 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       switch(currentTask) {
         is(writingBlock) {
           io.backBufferWriteEnable := true.B
-          posToGridIndex.io.xPos := blockXReg + blockLogic.io.activeOffsetX(writingCount)
-          posToGridIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
+          val line = blockXReg + blockLogic.io.activeOffsetX(writingCount)
+          val column = blockYReg + blockLogic.io.activeOffsetY(writingCount)
+          posToGridIndex.io.xPos := line
+          posToGridIndex.io.yPos := column
           posToIndex.io.xPos := blockXReg + blockLogic.io.activeOffsetX(writingCount)
           posToIndex.io.yPos := blockYReg + blockLogic.io.activeOffsetY(writingCount)
           grid(posToGridIndex.io.index) := blockLogic.io.tileNumber - 20.U
           io.backBufferWriteData := blockLogic.io.tileNumber
+          io.backBufferWriteAddress := posToIndex.io.index
+          
+          // Add line to lines to be cleared
+          val clearThisLine = WireInit(false.B)
+          when (blocksInLine(line.asUInt) + 1.U === 10.U) {
+            clearThisLine := true.B
+            linesToClearCount := linesToClearCount + 1.U
+            linesToClear(linesToClearCount) := line
+          }
+          blocksInLine(line.asUInt) := blocksInLine(line.asUInt) + 1.U
 
           when(writingCount === 3.U) {
             writingCount := 0.U
             blockXReg := blockStartX
             blockYReg := blockStartY
-            currentTask := nothing
-            stateReg := done
+
             newPiece := true.B
             rotation := 0.U
+
+            // Jump over to clearing lines
+            when( (linesToClearCount =/= 0.U) | clearThisLine ) {
+              currentTask := copyingLine
+              // We have a line to clear from previous clock cycles
+              when (linesToClearCount =/= 0.U) {
+                currentLine := linesToClear(0)
+              }
+              .otherwise { currentLine := line } // Take the one from current clock cycle
+            }
+            // Done drawing to backbuffer :D
+            .otherwise {
+              currentTask := nothing
+              stateReg := done
+            }
           }
           .otherwise { writingCount := writingCount + 1.U }
-          io.backBufferWriteAddress := posToIndex.io.index
         }
 
         is (copyingLine) {
-          when ( currentBlock === 9.U ) {
-            stateReg := done
-            currentBlock := 0.U
-          }
-          .otherwise {
-            val index = lineOffsets(currentBlock) + currentLine
-            val currentValue = grid(index)
-            val aboveValue = grid(index - 1.U)
-            io.backBufferWriteAddress := index
-            // Write above block to current block
-            when ( !(currentValue === aboveValue) ) {
-              io.backBufferWriteData := 20.U + aboveValue
-              grid(index) := grid(index - 1.U)
+          val continue = WireInit(false.B)
+
+          when ( currentBlock === 14.S ) {
+            currentBlock := 5.S
+            continueOnNextLine := false.B
+            when (continue | continueOnNextLine) {
+              currentLine := currentLine - 1.S
             }
-            currentBlock := currentBlock + 1.U
+            // We're completely done with this clearing. Check whether there's more lines to clear
+            .otherwise {
+              linesToClearCount := linesToClearCount - 1.U
+              when (linesToClearCount =/= 1.U) {
+                val clearingInitiator = linesToClear(linesToClearCount - 1.U)
+                val nextClearingInitiator = linesToClear(linesToClearCount - 2.U)
+                currentLine := Mux(nextClearingInitiator < clearingInitiator, clearingInitiator, nextClearingInitiator)
+                for (i <- 0 until 4) {
+                  linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) - 1.S, linesToClear(i))
+                }
+              }
+              .otherwise { stateReg := done }
+            }
+            // Copying count of above line
+            blocksInLine(currentLine.asUInt) := blocksInLine(currentLine.asUInt - 1.U)
+            blocksInLine(currentLine.asUInt - 1.U) := 0.U
           }
+          .otherwise { currentBlock := currentBlock + 1.S }
+
+          val toIndex = Module(new PosToIndex)
+          val toGridIndex = Module(new PosToGridIndex)
+          toIndex.io.xPos := currentLine
+          toGridIndex.io.xPos := currentLine
+          toIndex.io.yPos := currentBlock
+          toGridIndex.io.yPos := currentBlock
+          val currentValue = grid(toGridIndex.io.index)
+          val aboveValue = grid(toGridIndex.io.index - 1.U)
+
+          when (currentValue =/= 0.U) { continue := true.B}
+
+          io.backBufferWriteAddress := toIndex.io.index
+          when (currentValue =/= aboveValue) {
+            io.backBufferWriteEnable := true.B
+            io.backBufferWriteData := Mux(aboveValue === 0.U, 1.U, aboveValue + 20.U)
+            grid(toGridIndex.io.index) := aboveValue
+          }
+
+          when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
+        }
+        is(flashStart) {
+          when(blkCnt === 60.U) {
+            io.backBufferWriteEnable := true.B
+            when(startShow) { // Show: GAME START
+              io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
+              switch(startTileCnt) { //write different tiles
+                is(0.U) {
+                  io.backBufferWriteData := 4.U
+                }
+                is(1.U) {
+                  io.backBufferWriteData := 8.U
+                }
+                is(2.U) {
+                  io.backBufferWriteData := 30.U
+                }
+                is(3.U) {
+                  io.backBufferWriteData := 4.U
+                }
+                is(4.U) {
+                  io.backBufferWriteData := 6.U
+                }
+                is(5.U) {
+                  io.backBufferWriteData := 0.U
+                }
+                is(6.U) {
+                  io.backBufferWriteData := 2.U
+                }
+              }
+            }.otherwise { // Show blank
+              io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
+              io.backBufferWriteData := 0.U
+            }
+            when(startTileCnt === 9.U) {
+              startTileCnt := 0.U
+              startShow := ~startShow
+            }.otherwise {startTileCnt := startTileCnt + 1.U}
+          }.otherwise {blkCnt := blkCnt + 1.U}
+          stateReg := done
         }
       }
     }
@@ -247,7 +366,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
 
       // Downwards movement
       when(newPiece) {
-        blockType := rnd(2,0)
+        blockType := rnd(2,0) - 1.U
         newPiece := false.B
       }
 
@@ -298,12 +417,17 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       fallDetector.io.yOffsets := blockLogic.io.activeOffsetY
       movementDetector.io.xOffsets := blockLogic.io.activeOffsetX // This should use rotated offsets
       movementDetector.io.yOffsets := blockLogic.io.activeOffsetY // This should use rotated offsets
+
+      /* For debugging line clearing
+      // when (!io.btnD && !downReleased) { downReleased := true.B }
+
       // Clearing bottom line (WIP)
-      /*
-      when (io.btnD) {
+
+      when (io.btnD && downReleased) {
         nextState := task
         currentTask := copyingLine
-        currentLine := 19.U
+        currentLine := 19.S
+        downReleased := false.B
       }*/
 
       //Rotates tetris piece on up input

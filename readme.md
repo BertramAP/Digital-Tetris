@@ -63,9 +63,11 @@ Check if the state register is 3 bits wide.
 ![img.png](images/pinkBlock.png)
 ## Tile 27 sprite 24-27
 ![img.png](images/purpleBlock.png)
-## Tile 29
-![img.png](images/tile29.png)
+## Tile 28
+![img.png](images/letterG.png)
 ## Tile 29
 ![img.png](images/letterI.png)
 ## Tile 30
-![img.png](letterA.png)
+![img.png](images/letterA.png)
+## Tile 31
+![img.png](img.png)
