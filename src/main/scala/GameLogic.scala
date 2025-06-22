@@ -355,11 +355,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         blockYReg := movedY
         when(io.btnU && upRelease && rotation === 3.U) {
           rotation := 0.U
-          false.B
+          upRelease:= false.B
         } .elsewhen(io.btnU && upRelease) {
           rotation := rotation + 1.U
           upRelease := false.B
-        }. otherwise {upRelease := true.B}
+        }. elsewhen(!io.btnU) {upRelease := true.B}
       }.elsewhen (!fallDetector.io.isCollision) {
         blockXReg := fallenX
         blockYReg := fallenY
