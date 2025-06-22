@@ -10,7 +10,7 @@ Check if the state register is 3 bits wide.
 ## Tile 0
 ![img.png](images/Background.png)
 ## Tile 1
-number A?
+![img.png](images/blankTile.png)
 ## Tile 2
 ![img.png](images/letterE.png)
 ## Tile 3
@@ -56,7 +56,6 @@ number A?
 ## Tile 23
 
 ## Tile 24 and sprite 12-15
-
 ![img.png](images/blueBlock.png)
 ## Tile 25 and sprite 16-19
 ![img.png](images/orangeBlock.png)
@@ -66,7 +65,7 @@ number A?
 ![img.png](images/purpleBlock.png)
 ## Tile 29
 ![img.png](images/tile29.png)
+## Tile 29
+![img.png](images/letterI.png)
 ## Tile 30
-![img.png](images/tile30.png)
-## Tile 31
-![img.png](images/tile31.png)
+![img.png](letterA.png)
