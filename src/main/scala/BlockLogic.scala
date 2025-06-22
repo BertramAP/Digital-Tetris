@@ -29,8 +29,9 @@ class BlockLogic(SpriteNumber: Int) extends Module {
   val offSets = Module(new OffSets)
   // Block registers
   val s :: z :: square :: pipe :: lRight :: lLeft :: t :: Nil = Enum(7)
+  
   // Set position of relevant sprites
-  switch (io.sel-1.U) {
+  switch (io.sel) {
     // Red
     is(s) {
       when(io.rotation === 0.U || io.rotation === 2.U) {
