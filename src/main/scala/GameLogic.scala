@@ -129,6 +129,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   movementDetector.io.xOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
   movementDetector.io.yOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
 
+  // Sideways movement
+  val leftMovementCounter = RegInit(0.U(log2Up(16).W))
+  val rightMovementCounter = RegInit(0.U(log2Up(16).W))
+  val maxMovement = 14.U
+
   // Modules
   val posToIndex = Module(new PosToIndex)
   posToIndex.io.xPos := 0.S
@@ -169,7 +174,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   
   //LSFR to generate random tetris pieces
   val blockType = RegInit(3.U(3.W)) // RegInit(LFSR(3, seed=Some(1)) - 1.U)
-
 
   val rndEnable = WireInit(false.B)
   rndEnable := false.B
@@ -345,8 +349,25 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       .otherwise { moveCnt := moveCnt + 1.U}
 
       // Sideways movement
-      when(io.btnL) { moved := 1.S }
-      .elsewhen(io.btnR) { moved := -1.S }
+      when(io.btnL) {
+        when (leftMovementCounter === maxMovement) {
+          moved := 1.S
+          leftMovementCounter := 0.U
+        }
+        .otherwise { leftMovementCounter := leftMovementCounter + 1.U }
+        rightMovementCounter := 0.U
+      }
+      .elsewhen(io.btnR) {
+        when (rightMovementCounter === maxMovement) {
+          moved := -1.S
+          rightMovementCounter := 0.U
+        }
+        .otherwise {rightMovementCounter := rightMovementCounter + 1.U }
+        leftMovementCounter := 0.U
+      }
+      when (!io.btnL) { leftMovementCounter := 0.U }
+      when (!io.btnR) { rightMovementCounter := 0.U }
+
       // Only fallen
       val fallenX = blockXReg + fallen
       val fallenY = blockYReg
