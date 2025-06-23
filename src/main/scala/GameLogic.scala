@@ -199,7 +199,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
  // val testReg = RegInit(0.U(3.W))
   // testReg := Mux(linesToClearCount > testReg, linesToClearCount, testReg)
   //val testReg2 = RegInit(false.B)
-  /*
+
   io.led(0) := blocksInLine(19)(0)
   io.led(1) := blocksInLine(19)(1)
   io.led(2) := blocksInLine(19)(2)
