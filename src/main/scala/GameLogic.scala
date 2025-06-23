@@ -76,7 +76,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.startTune(0) := false.B
 
   // For writing to background
-  val nothing :: writingBlock :: copyingLine :: updateScoreBoard :: Nil = Enum(4)
+  val nothing :: writingBlock :: copyingLine :: Nil = Enum(3)
   val currentTask = RegInit(nothing)
   val writingCount = RegInit(0.U(2.W))
   // For line clearing
@@ -146,14 +146,14 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.frameUpdateDone := false.B
 
   // States
-  val idle :: task :: flashStart :: compute1 :: done :: Nil = Enum(5)
+  val idle :: task :: flashStart :: updateScoreBoard :: compute1 :: done :: Nil = Enum(6)
   val stateReg = RegInit(idle)
 
   // Sprite movement
   val scalaMaxCount = 60
   val maxCount = scalaMaxCount.U
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
-  val maxCountFast = 30.U
+  val maxCountFast = 15.U
 
   //Rotation for current piece
   val rotation = RegInit(0.U(2.W))
@@ -163,6 +163,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //Screen control
   val gameScreen = Module(new GameScreen)
   gameScreen.io.sw := io.sw(7)
+  gameScreen.io.gameOver := io.sw(5)
   io.viewBoxX := gameScreen.io.viewBoxX
   io.viewBoxY := gameScreen.io.viewBoxY
 
@@ -197,17 +198,13 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.led(0) := blocksInLine(19)(0)
   io.led(1) := blocksInLine(19)(1)
   io.led(2) := blocksInLine(19)(2)
-  io.led(3) := blocksInLine(19)(3)
-  io.led(4) := blocksInLine(19)(4)
-  io.led(5) := testReg
 
-  val startShow = RegInit(true.B)
+  val startShow = RegInit(false.B)
   val blkCnt = RegInit(0.U(6.W))
-  val startTileCnt = RegInit(0.U(4.W))
-
-  io.led(6) := startShow
+  val startTileCnt = RegInit(0.U(5.W))
 
   //lvl register
+  val scoreDecoder = Module(new ScoreDecoder)
   val lvl = RegInit(1.U(7.W))
   val linesCleared = RegInit(0.U(4.W)) //Used to check when to update lvl
   val newLinesCleared = RegInit(0.U(3.W)) //Used to calc score
@@ -216,16 +213,22 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val scoreUpdated = RegInit(false.B)
   val scoreCnt = RegInit(0.U(4.W))
   val newScore = RegInit(false.B)
+  val numbers = RegInit(VecInit(Seq.fill(5)(0.U(4.W))))
+  scoreDecoder.io.newLinesCleared := newLinesCleared
+  scoreDecoder.io.score := score
+  scoreDecoder.io.run := false.B
+  io.led(3) := newLinesCleared
+  io.led(4) := startTileCnt === 10.U
+  io.led(5) := startShow
+  io.led(6) := newScore
+
   //FSMD switch
   switch(stateReg) {
     is(idle) {
-      when(io.newFrame && !gameScreen.io.staticScreen && !newScore) {
+      when(io.newFrame && !gameScreen.io.staticScreen) {
         stateReg := compute1
-      }. elsewhen(io.newFrame && gameScreen.io.staticScreen && !newScore) {
+      }. elsewhen(io.newFrame && gameScreen.io.staticScreen) {
         stateReg := flashStart
-      }.elsewhen(io.newFrame && newScore && !gameScreen.io.staticScreen) {
-        stateReg := task
-        currentTask := updateScoreBoard
       }
       rndEnable := false.B
     }
@@ -273,7 +276,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             // Done drawing to backbuffer :D
             .otherwise {
               currentTask := nothing
-              stateReg := done
+              stateReg := updateScoreBoard
             }
           }
           .otherwise { writingCount := writingCount + 1.U }
@@ -300,7 +303,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
                 }
               }
               .otherwise {// We can now update the frame, but next frame we want to update the score
-                stateReg := done
+                stateReg := updateScoreBoard
+                currentTask := nothing
               }
             }
             // Copying count of above line
@@ -328,67 +332,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
 
           when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
         }
-        is(updateScoreBoard){
-          val numbers = RegInit(VecInit(Seq.fill(5)(0.U(4.W))))
-          val temp = RegInit(0.U(16.W))
-          val index = RegInit(0.U(3.W))
-          when(!scoreUpdated) {
-            linesCleared := newLinesCleared + linesCleared
-            when(linesCleared >= 10.U) {
-              linesCleared := linesCleared - 10.U
-              lvl := lvl + 1.U
-            } /*
-            switch(newLinesCleared) {
-              is(1.U) {score := score + 10.U * lvl}
-              is(2.U) {score := score + 40.U * lvl}
-              is(3.U) {score := score + 90.U * lvl}
-              is(4.U) {score := score + 150.U * lvl}
-            } */
-            scoreUpdated := true.B
-            temp := score
-            index := 0.U // Reset index
-            numbers(0) := newLinesCleared + numbers(0)
-            when(numbers(0) > 9.U) {
-              numbers(1) := numbers(1) + 1.U
-              numbers(0) := numbers(0) - 10.U
-            }
-            when(numbers(1) > 9.U) {
-              numbers(2) := numbers(2) + 1.U
-              numbers(1) := numbers(1) - 10.U
-            }
-            when(numbers(3) > 9.U) {
-              numbers(3) := numbers(3) + 1.U
-              numbers(2) := numbers(2) - 10.U
-            }
-            when(numbers(4) > 9.U) {
-              numbers(4) := numbers(4) + 1.U
-              numbers(3) := numbers(3) - 10.U
-            }
-          }.otherwise {
-            io.backBufferWriteData := true.B
-            when(score > topScore) { //Update top and current score
-              when(scoreCnt(0)) { //Take first but of scoreCnt to check if its odd or even
-                io.backBufferWriteAddress := 165.U - index * 40.U
-                io.backBufferWriteData := numbers(index) + 20.U
-                index := index + 1.U
-              }.otherwise {
-                io.backBufferWriteAddress := 163.U - index * 40.U
-                io.backBufferWriteData := numbers(index) + 20.U
-              }
-            }.otherwise {//Uppdate current score
-              io.backBufferWriteAddress := 165.U - index * 40.U
-              io.backBufferWriteData := numbers(index) + 20.U
-              index := index + 1.U
-            }
-            when(scoreCnt === 9.U || index === 5.U) {
-              scoreCnt := 0.U
-              stateReg := done
-              currentTask := nothing
-              scoreUpdated := false.B
-              newScore := false.B
-            }. otherwise {scoreCnt := scoreCnt + 1.U}
-          }
-        }
       }
     }
     is(flashStart) { // flashes the words: PRESS START
@@ -407,24 +350,28 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           is(6.U) { io.backBufferWriteData := 6.U } // S
           is(7.U) { io.backBufferWriteData := 6.U } // S
           is(8.U) { io.backBufferWriteData := 2.U }  // E
-          is(9.U) { io.backBufferWriteData := 4.U }  // R
-          is(10.U) { io.backBufferWriteData := 2.U }  // P
-          is(11.U) { io.backBufferWriteData := 2.U }  // P
-          is(12.U) { io.backBufferWriteData := 2.U }  // P
+          is(9.U) { io.backBufferWriteData := 8.U }  // R
+          is(10.U) { io.backBufferWriteData := 5.U }  // P
         }
+        when(startTileCnt === 10.U) {//Done swithcing PRESS START on or off
+          startTileCnt := 0.U
+          blkCnt := 0.U
+          startShow := false.B
+          stateReg := updateScoreBoard
+        }.elsewhen(startTileCnt =/= 10.U) {startTileCnt := startTileCnt + 1.U}
       }.otherwise { // Show blank
         io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
         io.backBufferWriteData := 1.U
+        when(startTileCnt === 10.U) {//Done swithcing PRESS START on or off
+          startTileCnt := 0.U
+          blkCnt := 0.U
+          startShow := true.B
+          stateReg := updateScoreBoard
+        }.elsewhen(startTileCnt =/= 10.U) {startTileCnt := startTileCnt + 1.U}
       }
-      when(startTileCnt === 11.U) {//Done swithcing PRESS START on or off
-        startTileCnt := 0.U
-        blkCnt := 0.U
-        startShow := ~startShow
-        stateReg := done
-      }.otherwise {startTileCnt := startTileCnt + 1.U}
     }.otherwise {
         blkCnt := blkCnt + 1.U
-        stateReg := done
+        stateReg := updateScoreBoard
       }
     }
     //Movement compute state
@@ -512,9 +459,33 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
 
       stateReg := nextState
     }
+    is(updateScoreBoard) { //Update the scoreBoard
+      scoreDecoder.io.run := true.B
+      when(scoreDecoder.io.done) {
+        stateReg := done
+        newLinesCleared := 0.U
+      }.otherwise {
+        io.backBufferWriteData := scoreDecoder.io.update
+        io.backBufferWriteAddress := scoreDecoder.io.writeAddress
+        io.backBufferWriteData := scoreDecoder.io.tileNumber
+        newScore := true.B
+      }
+      /*
+      when(score > topScore) { //Update top and current score on the display
+        when(scoreCnt(0)) { //Take first but of scoreCnt to check if its odd or even
+          io.backBufferWriteAddress := 165.U  //- index * 40.U
+          io.backBufferWriteData := 10.U
+          index := index + 1.U
+        }.otherwise {
+          io.backBufferWriteAddress := 162.U //- index * 40.U
+          io.backBufferWriteData := 10.U
+        }
+      }.otherwise {} *///Uppdate current score
+    }
     is(done) {
       io.frameUpdateDone := true.B
       stateReg := idle
+      newScore := false.B
     }
   }
 }
