@@ -7,7 +7,7 @@ class GameScreen() extends Module {
   val io = IO(new Bundle() {
     //Switches
     val sw = Input(Bool())
-
+    val gameOver = Input(Bool())
     //Viewbox control output
     val viewBoxX = Output(UInt(10.W)) //0 to 640
     val viewBoxY = Output(UInt(9.W)) //0 to 480
@@ -35,11 +35,17 @@ class GameScreen() extends Module {
       viewBoxYReg := 480.U
     }
     is(game) {
+      when(io.gameOver) {
+        currentScreen := over
+      }
       viewBoxXReg := 0.U
       viewBoxYReg := 0.U
       static := false.B
     }
     is(over) {
+      when(!io.gameOver) {
+        currentScreen := game
+      }
       static := true.B
       viewBoxXReg := 640.U
       viewBoxYReg := 480.U

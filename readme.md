@@ -6,11 +6,14 @@ When clearing lines, make the camera shake a little by changing the viewbox.
 Fixes to 4x1 piece not colliding staticly: \
 Check if the value 4(100) makes an error by switching the state values \
 Check if the state register is 3 bits wide. 
+
+Score registers need to be 16 bit wide
+![img_1.png](images/scoresystem.png) 
 ## Tile numbers
 ## Tile 0
 ![img.png](images/Background.png)
 ## Tile 1
-number A?
+![img.png](images/blankTile.png)
 ## Tile 2
 ![img.png](images/letterE.png)
 ## Tile 3
@@ -56,7 +59,6 @@ number A?
 ## Tile 23
 
 ## Tile 24 and sprite 12-15
-
 ![img.png](images/blueBlock.png)
 ## Tile 25 and sprite 16-19
 ![img.png](images/orangeBlock.png)
@@ -64,9 +66,11 @@ number A?
 ![img.png](images/pinkBlock.png)
 ## Tile 27 sprite 24-27
 ![img.png](images/purpleBlock.png)
+## Tile 28
+![img.png](images/letterG.png)
 ## Tile 29
-![img.png](images/tile29.png)
+![img.png](images/letterI.png)
 ## Tile 30
-![img.png](images/tile30.png)
+![img.png](images/letterA.png)
 ## Tile 31
-![img.png](images/tile31.png)
+![img.png](images/letterM.png)
