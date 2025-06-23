@@ -150,10 +150,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val stateReg = RegInit(idle)
 
   // Sprite movement
-  val scalaMaxCount = 30
+  val scalaMaxCount = 60
   val maxCount = scalaMaxCount.U
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
-  val realCnt = RegInit(0.U(6.W))
   val maxCountFast = 30.U
 
   //Rotation for current piece
@@ -201,11 +200,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   io.led(3) := blocksInLine(19)(3)
   io.led(4) := blocksInLine(19)(4)
   io.led(5) := testReg
-  io.led(6) := testReg2
 
   val startShow = RegInit(true.B)
   val blkCnt = RegInit(0.U(6.W))
   val startTileCnt = RegInit(0.U(4.W))
+
+  io.led(6) := startShow
 
   //lvl register
   val lvl = RegInit(1.U(7.W))
@@ -221,9 +221,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     is(idle) {
       when(io.newFrame && !gameScreen.io.staticScreen && !newScore) {
         stateReg := compute1
-      }. elsewhen(gameScreen.io.staticScreen) {
+      }. elsewhen(io.newFrame && gameScreen.io.staticScreen && !newScore) {
         stateReg := flashStart
-      }.elsewhen(newScore) {
+      }.elsewhen(io.newFrame && newScore && !gameScreen.io.staticScreen) {
         stateReg := task
         currentTask := updateScoreBoard
       }
@@ -301,7 +301,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
               }
               .otherwise {// We can now update the frame, but next frame we want to update the score
                 stateReg := done
-                newScore := true.B
               }
             }
             // Copying count of above line
@@ -338,22 +337,37 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             when(linesCleared >= 10.U) {
               linesCleared := linesCleared - 10.U
               lvl := lvl + 1.U
-            }
+            } /*
             switch(newLinesCleared) {
-              is(1.U) {score := score + 10.U *lvl}
-              is(2.U) {score := score + 40.U *lvl}
-              is(3.U) {score := score + 90.U *lvl}
-              is(4.U) {score := score + 150.U *lvl}
-            }
+              is(1.U) {score := score + 10.U * lvl}
+              is(2.U) {score := score + 40.U * lvl}
+              is(3.U) {score := score + 90.U * lvl}
+              is(4.U) {score := score + 150.U * lvl}
+            } */
             scoreUpdated := true.B
             temp := score
             index := 0.U // Reset index
+            numbers(0) := newLinesCleared + numbers(0)
+            when(numbers(0) > 9.U) {
+              numbers(1) := numbers(1) + 1.U
+              numbers(0) := numbers(0) - 10.U
+            }
+            when(numbers(1) > 9.U) {
+              numbers(2) := numbers(2) + 1.U
+              numbers(1) := numbers(1) - 10.U
+            }
+            when(numbers(3) > 9.U) {
+              numbers(3) := numbers(3) + 1.U
+              numbers(2) := numbers(2) - 10.U
+            }
+            when(numbers(4) > 9.U) {
+              numbers(4) := numbers(4) + 1.U
+              numbers(3) := numbers(3) - 10.U
+            }
           }.otherwise {
             io.backBufferWriteData := true.B
             when(score > topScore) { //Update top and current score
               when(scoreCnt(0)) { //Take first but of scoreCnt to check if its odd or even
-                numbers(index) := temp % 10.U
-                temp := temp / 10.U
                 io.backBufferWriteAddress := 165.U - index * 40.U
                 io.backBufferWriteData := numbers(index) + 20.U
                 index := index + 1.U
@@ -362,9 +376,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
                 io.backBufferWriteData := numbers(index) + 20.U
               }
             }.otherwise {//Uppdate current score
-              numbers(index) := temp % 10.U
-              temp := temp / 10.U
-              scoreCnt := scoreCnt + 1.U //Increment scoreCnt by an extra 1
               io.backBufferWriteAddress := 165.U - index * 40.U
               io.backBufferWriteData := numbers(index) + 20.U
               index := index + 1.U
@@ -374,16 +385,18 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
               stateReg := done
               currentTask := nothing
               scoreUpdated := false.B
+              newScore := false.B
             }. otherwise {scoreCnt := scoreCnt + 1.U}
           }
         }
       }
     }
     is(flashStart) { // flashes the words: PRESS START
-      when(blkCnt === 59.U) { // Amount of frames beetween showing and not showing PRESS START
+      when(blkCnt === 29.U) { // Amount of frames beetween showing and not showing PRESS START
       io.backBufferWriteEnable := true.B
       when(startShow) { // Show: PRESS START
-        io.backBufferWriteAddress := 727.U + startTileCnt * 40.U
+        io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
+
         switch(startTileCnt) { //write different tiles
           is(0.U) { io.backBufferWriteData := 4.U }  // T
           is(1.U) { io.backBufferWriteData := 8.U }  // R
@@ -394,20 +407,25 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           is(6.U) { io.backBufferWriteData := 6.U } // S
           is(7.U) { io.backBufferWriteData := 6.U } // S
           is(8.U) { io.backBufferWriteData := 2.U }  // E
-          is(9.U) { io.backBufferWriteData := 8.U }  // R
-          is(10.U) { io.backBufferWriteData := 5.U }  // P
+          is(9.U) { io.backBufferWriteData := 4.U }  // R
+          is(10.U) { io.backBufferWriteData := 2.U }  // P
+          is(11.U) { io.backBufferWriteData := 2.U }  // P
+          is(12.U) { io.backBufferWriteData := 2.U }  // P
         }
       }.otherwise { // Show blank
         io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
-        io.backBufferWriteData := 0.U
+        io.backBufferWriteData := 1.U
       }
-      when(startTileCnt === 10.U) {//Done swithcing PRESS START on or off
+      when(startTileCnt === 11.U) {//Done swithcing PRESS START on or off
         startTileCnt := 0.U
-        startShow := ~startShow
         blkCnt := 0.U
+        startShow := ~startShow
+        stateReg := done
       }.otherwise {startTileCnt := startTileCnt + 1.U}
-    }.otherwise {blkCnt := blkCnt + 1.U}
-      stateReg := done
+    }.otherwise {
+        blkCnt := blkCnt + 1.U
+        stateReg := done
+      }
     }
     //Movement compute state
     is(compute1) {
