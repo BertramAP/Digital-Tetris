@@ -192,16 +192,27 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val speedThreshold = RegInit(maxCount)
   speedThreshold := Mux(io.btnD, maxCountFast, maxCount)
 
-  val testReg = RegInit(false.B)
-  testReg := Mux(testReg > linesToClearCount, linesToClearCount, testReg)
-  val testReg2 = RegInit(false.B)
+ // val testReg = RegInit(0.U(3.W))
+  // testReg := Mux(linesToClearCount > testReg, linesToClearCount, testReg)
+  //val testReg2 = RegInit(false.B)
+  /*
   io.led(0) := blocksInLine(19)(0)
   io.led(1) := blocksInLine(19)(1)
   io.led(2) := blocksInLine(19)(2)
   io.led(3) := blocksInLine(19)(3)
   io.led(4) := blocksInLine(19)(4)
   io.led(5) := testReg
-  io.led(6) := testReg2
+  io.led(6) := testReg2*/
+  val testReg = RegInit(0.U(3.W))
+  //io.led(0) := linesToClear(3)(0)
+  //io.led(1) := linesToClear(3)(1)
+  //io.led(2) := linesToClear(3)(2)
+  //io.led(3) := linesToClear(3)(3)
+  //io.led(4) := linesToClear(3)(4)
+  //io.led(5) := linesToClear(3)(5)
+  io.led(0) := testReg(0)
+  io.led(1) := testReg(1)
+  io.led(2) := testReg(2)
 
   //FSMD switch
   switch(stateReg) {
@@ -247,11 +258,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             // Jump over to clearing lines
             when( (linesToClearCount =/= 0.U) | clearThisLine ) {
               currentTask := copyingLine
-              // We have a line to clear from previous clock cycles
-              when (linesToClearCount =/= 0.U) {
-                currentLine := linesToClear(0)
-              }
-              .otherwise { currentLine := line } // Take the one from current clock cycle
+              // We have a line to clear from current clock cycles
+              when ( clearThisLine ) { currentLine := line } // Take the one from current clock cycle
+              // Take from previous clock cycle
+              .otherwise { currentLine := linesToClear(linesToClearCount - 1.U) }
             }
             // Done drawing to backbuffer :D
             .otherwise {
@@ -273,16 +283,17 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             }
             // We're completely done with this clearing. Check whether there's more lines to clear
             .otherwise {
+              testReg := testReg + 1.U
               linesToClearCount := linesToClearCount - 1.U
-              when (linesToClearCount =/= 1.U) {
+              when (linesToClearCount === 1.U) { stateReg := done }
+              .otherwise {
                 val clearingInitiator = linesToClear(linesToClearCount - 1.U)
                 val nextClearingInitiator = linesToClear(linesToClearCount - 2.U)
                 currentLine := Mux(nextClearingInitiator < clearingInitiator, clearingInitiator, nextClearingInitiator)
                 for (i <- 0 until 4) {
-                  linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) - 1.S, linesToClear(i))
+                  linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) + 1.S, linesToClear(i))
                 }
               }
-              .otherwise { stateReg := done }
             }
             // Copying count of above line
             blocksInLine(currentLine.asUInt) := blocksInLine(currentLine.asUInt - 1.U)
@@ -299,7 +310,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           val currentValue = grid(toGridIndex.io.index)
           val aboveValue = grid(toGridIndex.io.index - 1.U)
 
-          when (currentValue =/= 0.U) { continue := true.B}
+          when (currentValue =/= 0.U) { continue := true.B }
+          when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
 
           io.backBufferWriteAddress := toIndex.io.index
           when (currentValue =/= aboveValue) {
@@ -308,7 +320,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             grid(toGridIndex.io.index) := aboveValue
           }
 
-          when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
         }
       }
     }
