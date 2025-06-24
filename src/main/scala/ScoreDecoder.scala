@@ -14,14 +14,17 @@ class ScoreDecoder extends Module {
     val update = Output(Bool())
     val done = Output(Bool())
   })
-  val dontUpdate :: updateScore :: updateDisplay :: doneUpdating :: Nil = Enum(4)
+  val dontUpdate :: updateDisplay :: doneUpdating :: Nil = Enum(3)
   val updateReg = RegInit(dontUpdate)
   val numbers = RegInit(VecInit(Seq.fill(5)(0.U(4.W))))
   val cnt = RegInit(0.U(4.W))
+  // Default outputs
   io.done := false.B
-  io.writeAddress := 165.U
-  io.tileNumber := 0.U
+  io.writeAddress := 165.U  // Pre-calculate address
+  io.tileNumber := 10.U  // Hardcoded to tile 10
   io.update := false.B
+
+  /*
   when(numbers(0) > 9.U) {
     numbers(1) := numbers(1) + 1.U
     numbers(0) := numbers(0) - 10.U
@@ -36,22 +39,13 @@ class ScoreDecoder extends Module {
   }
   when(numbers(4) > 9.U) {
     numbers(4) := 9.U
-  }
-
+  } */
   switch(updateReg) {
     is(dontUpdate) {
       when(io.run) {
-        updateReg := updateDisplay
-      }.otherwise(
-        updateReg := dontUpdate
-      )
-    }
-    is(updateScore) {
-      when(io.newLinesCleared > 0.U) {
-        numbers(0) := io.newLinesCleared + numbers(0)
-        updateReg := updateDisplay
+        updateReg := updateDisplay //should be updateScore
       }.otherwise {
-        updateReg := doneUpdating
+        updateReg := dontUpdate
       }
     }
     is(updateDisplay) {
@@ -61,9 +55,7 @@ class ScoreDecoder extends Module {
       when(cnt === 4.U) {
         cnt := 0.U
         updateReg := doneUpdating
-      }.otherwise {
-        cnt := cnt + 1.U
-      }
+      }.otherwise {cnt := cnt + 1.U}
     }
     is(doneUpdating) {
       io.done := true.B
@@ -82,4 +74,25 @@ class ScoreDecoder extends Module {
     is(4.U) {score := score + 150.U * lvl}
   } */
 
+/*
+when(score > topScore) { //Update top and current score on the display
+  when(scoreCnt(0)) { //Take first but of scoreCnt to check if its odd or even
+    io.backBufferWriteAddress := 165.U  //- index * 40.U
+    io.backBufferWriteData := 10.U
+    index := index + 1.U
+  }.otherwise {
+    io.backBufferWriteAddress := 162.U //- index * 40.U
+    io.backBufferWriteData := 10.U
+  }
+}.otherwise {} *///Uppdate current score
+/*
 
+    is(updateScore) {
+      when(io.newLinesCleared > 0.U) {
+        numbers(0) := io.newLinesCleared + numbers(0)
+        updateReg := updateDisplay
+      }.otherwise {
+        updateReg := doneUpdating
+      }
+    }
+*/
