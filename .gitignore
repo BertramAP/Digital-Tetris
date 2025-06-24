@@ -1,5 +1,6 @@
-*.fir
-*.v
+RamSpWf.v
+RamInitSpWf.v
+Top.v
 target/scala-2.13/classes/GameLogic.class
 target/scala-2.13/classes/GameScreen.class
 Top.anno.json
