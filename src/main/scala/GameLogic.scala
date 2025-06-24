@@ -82,22 +82,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val currentLine = RegInit(0.S(11.W)) // From top
   val currentBlock = RegInit(5.S(10.W)) // From right
   val continueOnNextLine = RegInit(false.B)
-  val blocksInLine = RegInit(VecInit(Seq.tabulate(20) { i =>
-   if (i >= 16) 9.U(5.W) else 0.U(5.W)
-  }))
+  val blocksInLine = RegInit(VecInit(Seq.fill(20)(0.U(5.W))))
   val linesToClearCount = RegInit(0.U(3.W))
   val linesToClear = RegInit(VecInit(Seq.fill(4)(0.S(6.W))))
 
-  // Registers for storing all placed blocks
-  /*val grid = RegInit(VecInit(Seq.tabulate(300) { i =>
-    if ((0 until 10).exists(j => i == j * 25 + 23)) 1.U(3.W)
-    else 0.U(3.W)
-  }))*/
-  val grid = RegInit(VecInit.tabulate(300) { i =>
-    val mod25 = i % 25  // Check position within each 25-element block
-    if ((0 until 10).contains(i / 25) && (20 to 23).contains(mod25)) 1.U(3.W)
-    else 0.U(3.W)
-  })
+  val grid = RegInit(VecInit(Seq.fill(300)(0.U(3.W))))
   // Setting bottom of screen
   for (i <- 0 until 12) {
     grid(i * 25 + 24) := 1.U
@@ -170,7 +159,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val gameScreen = Module(new GameScreen)
   val screenOffSet = RegInit(0.U(10.W))
   gameScreen.io.sw := io.btnC
-  gameScreen.io.gameOver := io.sw(6) //GAME OVER BOOL
+  //gameScreen.io.gameOver := io.sw(6) //GAME OVER BOOL
+  val gameOver = RegInit(false.B)
+  gameScreen.io.gameOver := gameOver
   io.viewBoxX := gameScreen.io.viewBoxX
   io.viewBoxY := gameScreen.io.viewBoxY
 
@@ -497,16 +488,21 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         blockXReg := fallenX
         blockYReg := fallenY
       }
+      // We have collision
       .otherwise {
+        when (blockXReg === -4.S) { gameOver := true.B }
+
         nextState := task
         currentTask := writingBlock
       }
 
       // Connecting offsets to collison detector
+      val activeOffsetX = WireInit(blockLogic.io.activeOffsetX)
+      val activeOffsetY = WireInit(blockLogic.io.activeOffsetY)
       fallDetector.io.xOffsets := blockLogic.io.activeOffsetX
       fallDetector.io.yOffsets := blockLogic.io.activeOffsetY
-      movementDetector.io.xOffsets := blockLogic.io.activeOffsetX // This should use rotated offsets
-      movementDetector.io.yOffsets := blockLogic.io.activeOffsetY // This should use rotated offsets
+      movementDetector.io.xOffsets := activeOffsetX
+      movementDetector.io.yOffsets := activeOffsetY
 
       /* For debugging line clearing
       // when (!io.btnD && !downReleased) { downReleased := true.B }
@@ -522,8 +518,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
 
       //Rotates tetris piece on up input
       when(io.btnU) {
-        movementDetector.io.xOffsets := blockLogic.io.nextOffsetX // This should use rotated offsets
-        movementDetector.io.yOffsets := blockLogic.io.nextOffsetY // This should use rotated offsets
+        activeOffsetX := blockLogic.io.nextOffsetX // This should use rotated offsets
+        activeOffsetY := blockLogic.io.nextOffsetY // This should use rotated offsets
       }
 
       stateReg := nextState
