@@ -128,6 +128,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   movementDetector.io.xOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
   movementDetector.io.yOffsets := VecInit(Seq.fill(4)(0.S(4.W)))
 
+  // Sideways movement
+  val leftMovementCounter = RegInit(0.U(log2Up(16).W))
+  val rightMovementCounter = RegInit(0.U(log2Up(16).W))
+  val maxMovement = 14.U
+
   // Modules
   val posToIndex = Module(new PosToIndex)
   posToIndex.io.xPos := 0.S
@@ -169,7 +174,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //LSFR to generate random tetris pieces
   val blockType = RegInit(3.U(3.W)) // RegInit(LFSR(3, seed=Some(1)) - 1.U)
 
-
   val rndEnable = WireInit(false.B)
   rndEnable := false.B
   val rnd = LFSR(3, increment = rndEnable, seed = Some(1))
@@ -191,9 +195,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val speedThreshold = RegInit(maxCount)
   speedThreshold := Mux(io.btnD, maxCountFast, maxCount)
 
-  val testReg = RegInit(false.B)
-  testReg := Mux(testReg > linesToClearCount, linesToClearCount, testReg)
-  val testReg2 = RegInit(false.B)
+ // val testReg = RegInit(0.U(3.W))
+  // testReg := Mux(linesToClearCount > testReg, linesToClearCount, testReg)
+  //val testReg2 = RegInit(false.B)
+
   io.led(0) := blocksInLine(19)(0)
   io.led(1) := blocksInLine(19)(1)
   io.led(2) := blocksInLine(19)(2)
@@ -267,11 +272,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             // Jump over to clearing lines
             when( (linesToClearCount =/= 0.U) | clearThisLine ) {
               currentTask := copyingLine
-              // We have a line to clear from previous clock cycles
-              when (linesToClearCount =/= 0.U) {
-                currentLine := linesToClear(0)
-              }
-              .otherwise { currentLine := line } // Take the one from current clock cycle
+              // We have a line to clear from current clock cycles
+              when ( clearThisLine ) { currentLine := line } // Take the one from current clock cycle
+              // Take from previous clock cycle
+              .otherwise { currentLine := linesToClear(linesToClearCount - 1.U) }
             }
             // Done drawing to backbuffer :D
             .otherwise {
@@ -293,13 +297,15 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             }
             // We're completely done with this clearing. Check whether there's more lines to clear
             .otherwise {
+              testReg := testReg + 1.U
               linesToClearCount := linesToClearCount - 1.U
-              when (linesToClearCount =/= 1.U) {
+              when (linesToClearCount === 1.U) { stateReg := done }
+              .otherwise {
                 val clearingInitiator = linesToClear(linesToClearCount - 1.U)
                 val nextClearingInitiator = linesToClear(linesToClearCount - 2.U)
                 currentLine := Mux(nextClearingInitiator < clearingInitiator, clearingInitiator, nextClearingInitiator)
                 for (i <- 0 until 4) {
-                  linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) - 1.S, linesToClear(i))
+                  linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) + 1.S, linesToClear(i))
                 }
               }
               .otherwise {// We can now update the frame, but next frame we want to update the score
@@ -321,7 +327,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           val currentValue = grid(toGridIndex.io.index)
           val aboveValue = grid(toGridIndex.io.index - 1.U)
 
-          when (currentValue =/= 0.U) { continue := true.B}
+          when (currentValue =/= 0.U) { continue := true.B }
+          when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
 
           io.backBufferWriteAddress := toIndex.io.index
           when (currentValue =/= aboveValue) {
@@ -330,7 +337,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             grid(toGridIndex.io.index) := aboveValue
           }
 
-          when (continue & currentBlock =/= 14.S) { continueOnNextLine := true.B }
         }
       }
     }
@@ -398,8 +404,25 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       .otherwise { moveCnt := moveCnt + 1.U}
 
       // Sideways movement
-      when(io.btnL) { moved := 1.S }
-      .elsewhen(io.btnR) { moved := -1.S }
+      when(io.btnL) {
+        when (leftMovementCounter === maxMovement) {
+          moved := 1.S
+          leftMovementCounter := 0.U
+        }
+        .otherwise { leftMovementCounter := leftMovementCounter + 1.U }
+        rightMovementCounter := 0.U
+      }
+      .elsewhen(io.btnR) {
+        when (rightMovementCounter === maxMovement) {
+          moved := -1.S
+          rightMovementCounter := 0.U
+        }
+        .otherwise {rightMovementCounter := rightMovementCounter + 1.U }
+        leftMovementCounter := 0.U
+      }
+      when (!io.btnL) { leftMovementCounter := 0.U }
+      when (!io.btnR) { rightMovementCounter := 0.U }
+
       // Only fallen
       val fallenX = blockXReg + fallen
       val fallenY = blockYReg
