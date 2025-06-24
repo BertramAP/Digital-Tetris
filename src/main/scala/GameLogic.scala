@@ -216,10 +216,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   scoreDecoder.io.newLinesCleared := newLinesCleared
   scoreDecoder.io.run := scoreUpdateRun
   lvl := scoreDecoder.io.lvl
-  io.led(3) := gameScreen.io.over
-  io.led(4) := newLinesCleared(0)
-  io.led(5) := newLinesCleared(1)
-  io.led(6) := newLinesCleared(2)
+  scoreDecoder.io.clear := false.B
+
 
   when(lvl-1.U < 5.U) {
     maxCount := slowMovement(lvl - 1.U)
@@ -438,28 +436,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           moved := 0.S
         }
 
-      /*
-      when(io.btnL) {
-        when (leftMovementCounter === maxMovement || movementReleased) {
-          moved := 1.S
-          leftMovementCounter := 0.U
-        }
-        .otherwise { leftMovementCounter := leftMovementCounter + 1.U }
-        rightMovementCounter := 0.U
-        movementReleased := false.B
-      }
-      .elsewhen(io.btnR) {
-        when (rightMovementCounter === maxMovement || movementReleased) {
-          moved := -1.S
-          rightMovementCounter := 0.U
-        }
-        .otherwise {rightMovementCounter := rightMovementCounter + 1.U }
-        leftMovementCounter := 0.U
-        movementReleased := false.B
-      }
-      when (!io.btnL) { leftMovementCounter := 0.U }
-      when (!io.btnR) { rightMovementCounter := 0.U }
-      */
       // Only fallen
       val fallenX = blockXReg + fallen
       val fallenY = blockYReg
@@ -490,7 +466,10 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
       // We have collision
       .otherwise {
-        when (blockXReg === -4.S) { gameOver := true.B }
+        when (blockXReg === -4.S) { //Game Over
+          gameOver := true.B
+          scoreDecoder.io.clear := true.B
+        }
 
         nextState := task
         currentTask := writingBlock

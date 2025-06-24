@@ -7,7 +7,10 @@ Know the PLL should be ready to be generated. Your design hierarchy, after addin
 ![img_1.png](images/setup3.png)
 ## Game Tutorial
 When starting the game, you will see the start screen. Here the start button is the central button on the basys board. This button is the same button used on the game over screen, to play again. When the tetris game is running, a piece will be generated pseudo randomly, that the player can move horizontally by pressing the buttons on either side depending on which way the player wants to move the piece.  The piece controlled by the player can be rotated by pressing the button up, and the player can also increase the piece falling speed by pressing the button down.
-Clearing more lines at once will give a better score, just note that the score is displayed in hexadecimal, but the level displayed is decimal. When the level increases, so will the fall speed when and when not pressing the down button.  When a piece is placed out of bounds the game will end, and the score and level will be reset.
+Clearing more lines at once will give a better score, just note that the score is displayed in hexadecimal, but the level displayed is decimal. When the level increases, so will the fall speed when and when not pressing the down button.
+When a piece is placed out of bounds the game will end, and the score and level will be reset.
+For testing purposes the level is incremented every 5 lines cleared, were its 10 in the original tetris.
+This can be changed in line 154 in the ScoreDecoder module. 
 ## For refernce only (not actual point system)
 ![img_1.png](images/scoresystem.png) 
 
@@ -43,6 +46,7 @@ Clearing more lines at once will give a better score, just note that the score i
 ## Tile 14
 ![img.png](images/number4.png)
 ## Tile 15
+
 ![img.png](images/number15.png)
 ## Tile 16
 ![img.png](images/number6.png)

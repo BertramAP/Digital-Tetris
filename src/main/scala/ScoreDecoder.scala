@@ -6,7 +6,7 @@ class ScoreDecoder extends Module {
     //Input
     val run = Input(Bool())
     val newLinesCleared = Input(UInt(4.W))
-
+    val clear = Input(Bool()) //Removed all saved values related to score, to start clean
     //Outputs
     val writeAddress = Output(UInt(11.W))
     val tileNumber = Output(UInt(5.W))
@@ -28,7 +28,19 @@ class ScoreDecoder extends Module {
   io.tileNumber := 10.U  // Hardcoded to tile 10
   io.update := false.B
   io.lvl := lvl
-
+  when(io.clear) {
+    numbers(0) := 0.U
+    numbers(1) := 0.U
+    numbers(2) := 0.U
+    numbers(3) := 0.U
+    numbers(4) := 0.U
+    cnt := 0.U(4.W)
+    lvl := 1.U(7.W)
+    linesCleared := 0.U(4.W)
+    score := 0.U(20.W)
+    lvlDec(0) := 1.U
+    lvlDec(1) := 0.U
+  }
   // Switch statement for score(3,0) -> numbers(0)
   switch(score(3, 0)) {
     is(0.U)  {numbers(0) := 10.U }  // Tile 0
