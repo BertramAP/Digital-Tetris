@@ -42,7 +42,7 @@ class GameTop extends Module {
   })
 
   val SPRITE_NUMBER = 32
-  val BACK_TILE_NUMBER = 32
+  val BACK_TILE_NUMBER = 64
   val graphicEngineVGA = Module(new GraphicEngineVGA(SPRITE_NUMBER, BACK_TILE_NUMBER))
 
   val TUNE_NUMBER = 2
@@ -53,7 +53,7 @@ class GameTop extends Module {
   val gameLogic = Module(new GameLogic(SPRITE_NUMBER, BACK_TILE_NUMBER, TUNE_NUMBER))
 
   //Debouncing
-  val CLOCK_FREQUENCY_HZ = 100000000 //100 MHz
+  val CLOCK_FREQUENCY_HZ = 50000000 //50 MHz (past 100 MHz)
   val DEBOUNCE_PERIOD_US = 20000 //20 ms
   val DEBOUNCE_COUNTER_MAX = CLOCK_FREQUENCY_HZ / 1000000 * DEBOUNCE_PERIOD_US
   val debounceCounter = RegInit(0.U(log2Up(DEBOUNCE_COUNTER_MAX).W))

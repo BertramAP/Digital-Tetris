@@ -131,8 +131,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // Sideways movement
   val leftMovementCounter = RegInit(0.U(log2Up(16).W))
   val rightMovementCounter = RegInit(0.U(log2Up(16).W))
+  val movementReleased = RegInit(true.B)
   val maxMovement = 14.U
-
   // Modules
   val posToIndex = Module(new PosToIndex)
   posToIndex.io.xPos := 0.S
@@ -154,10 +154,12 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val stateReg = RegInit(idle)
 
   // Sprite movement
+  val slowMovement = RegInit(VecInit(60.U(6.W), 45.U(6.W), 30.U(6.W), 15.U(6.W), 10.U(6.W)))
+  val fastMovement = RegInit(VecInit(30.U(6.W), 22.U(6.W), 15.U(6.W), 8.U(6.W), 5.U(6.W)))
   val scalaMaxCount = 60
-  val maxCount = scalaMaxCount.U
+  val maxCount = RegInit(scalaMaxCount.U(6.W))
   val moveCnt = RegInit(0.U(log2Up(scalaMaxCount).W))
-  val maxCountFast = 15.U
+  val maxCountFast = RegInit(30.U(6.W))
 
   //Rotation for current piece
   val rotation = RegInit(0.U(2.W))
@@ -166,8 +168,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val downReleased = RegInit(true.B)
   //Screen control
   val gameScreen = Module(new GameScreen)
-  gameScreen.io.sw := io.sw(7)
-  gameScreen.io.gameOver := io.sw(5)
+  val screenOffSet = RegInit(0.U(10.W))
+  gameScreen.io.sw := io.btnC
+  gameScreen.io.gameOver := io.sw(6) //GAME OVER BOOL
   io.viewBoxX := gameScreen.io.viewBoxX
   io.viewBoxY := gameScreen.io.viewBoxY
 
@@ -220,19 +223,26 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   val scoreUpdateRun = RegInit(false.B)
   scoreUpdateRun := false.B
   scoreDecoder.io.newLinesCleared := newLinesCleared
-  scoreDecoder.io.score := score
   scoreDecoder.io.run := scoreUpdateRun
-  io.led(3) := newLinesCleared
-  io.led(4) := scoreUpdateRun
-  io.led(5) := scoreDecoder.io.done
-  io.led(6) := scoreDecoder.io.update
+  lvl := scoreDecoder.io.lvl
+  io.led(3) := gameScreen.io.over
+  io.led(4) := newLinesCleared(0)
+  io.led(5) := newLinesCleared(1)
+  io.led(6) := newLinesCleared(2)
 
+  when(lvl-1.U < 5.U) {
+    maxCount := slowMovement(lvl - 1.U)
+    maxCountFast := fastMovement(lvl - 1.U)
+  }. otherwise {
+    maxCount := slowMovement(4.U)
+    maxCountFast := fastMovement(4.U)
+  }
   //FSMD switch
   switch(stateReg) {
     is(idle) {
       when(io.newFrame && !gameScreen.io.staticScreen) {
         stateReg := compute1
-      }. elsewhen(io.newFrame && gameScreen.io.staticScreen) {
+      }. elsewhen(io.newFrame && (gameScreen.io.staticScreen ||gameScreen.io.over)) {
         stateReg := flashStart
       }
       rndEnable := false.B
@@ -297,9 +307,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
             }
             // We're completely done with this clearing. Check whether there's more lines to clear
             .otherwise {
-              testReg := testReg + 1.U
               linesToClearCount := linesToClearCount - 1.U
-              when (linesToClearCount === 1.U) { stateReg := done }
+              when (linesToClearCount === 1.U) { stateReg := updateScoreBoard}
               .otherwise {
                 val clearingInitiator = linesToClear(linesToClearCount - 1.U)
                 val nextClearingInitiator = linesToClear(linesToClearCount - 2.U)
@@ -307,10 +316,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
                 for (i <- 0 until 4) {
                   linesToClear(i) := Mux(linesToClear(i) < clearingInitiator, linesToClear(i) + 1.S, linesToClear(i))
                 }
-              }
-              .otherwise {// We can now update the frame, but next frame we want to update the score
-                stateReg := updateScoreBoard
-                currentTask := nothing
               }
             }
             // Copying count of above line
@@ -341,10 +346,13 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
     }
     is(flashStart) { // flashes the words: PRESS START
+      when(gameScreen.io.over) {
+        screenOffSet := 707.U
+      }.otherwise {screenOffSet := 687.U}
       when(blkCnt === 29.U) { // Amount of frames beetween showing and not showing PRESS START
       io.backBufferWriteEnable := true.B
       when(startShow) { // Show: PRESS START
-        io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
+        io.backBufferWriteAddress :=  screenOffSet + startTileCnt * 40.U
 
         switch(startTileCnt) { //write different tiles
           is(0.U) { io.backBufferWriteData := 4.U }  // T
@@ -366,7 +374,7 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           stateReg := done
         }.elsewhen(startTileCnt =/= 10.U) {startTileCnt := startTileCnt + 1.U}
       }.otherwise { // Show blank
-        io.backBufferWriteAddress := 687.U + startTileCnt * 40.U
+        io.backBufferWriteAddress := startTileCnt * 40.U + screenOffSet
         io.backBufferWriteData := 1.U
         when(startTileCnt === 10.U) {//Done swithcing PRESS START on or off
           startTileCnt := 0.U
@@ -403,26 +411,64 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
       }
       .otherwise { moveCnt := moveCnt + 1.U}
 
-      // Sideways movement
+      movementReleased := true.B //checks when user is pressing or holding mvm btn
+      // Sideways
+      when(io.btnL || io.btnR) {
+        when(io.btnL) {
+          // Immediate movement on first press or after delay
+          when(leftMovementCounter === maxMovement || movementReleased) {
+            moved := 1.S
+            leftMovementCounter := 0.U
+            moved := 1.S  // Signal right movement
+          }
+            .otherwise {
+              leftMovementCounter := leftMovementCounter + 1.U
+            }
+          rightMovementCounter := 0.U
+        }
+          .elsewhen(io.btnR) {
+            when(rightMovementCounter === maxMovement || movementReleased) {
+              moved := -1.S
+              rightMovementCounter := 0.U
+              moved := -1.S  // Signal left movement
+            }
+              .otherwise {
+                rightMovementCounter := rightMovementCounter + 1.U
+              }
+            leftMovementCounter := 0.U
+          }
+        movementReleased := false.B
+      }
+        .otherwise {
+          // No buttons pressed
+          movementReleased := true.B
+          leftMovementCounter := 0.U
+          rightMovementCounter := 0.U
+          moved := 0.S
+        }
+
+      /*
       when(io.btnL) {
-        when (leftMovementCounter === maxMovement) {
+        when (leftMovementCounter === maxMovement || movementReleased) {
           moved := 1.S
           leftMovementCounter := 0.U
         }
         .otherwise { leftMovementCounter := leftMovementCounter + 1.U }
         rightMovementCounter := 0.U
+        movementReleased := false.B
       }
       .elsewhen(io.btnR) {
-        when (rightMovementCounter === maxMovement) {
+        when (rightMovementCounter === maxMovement || movementReleased) {
           moved := -1.S
           rightMovementCounter := 0.U
         }
         .otherwise {rightMovementCounter := rightMovementCounter + 1.U }
         leftMovementCounter := 0.U
+        movementReleased := false.B
       }
       when (!io.btnL) { leftMovementCounter := 0.U }
       when (!io.btnR) { rightMovementCounter := 0.U }
-
+      */
       // Only fallen
       val fallenX = blockXReg + fallen
       val fallenY = blockYReg
@@ -482,17 +528,20 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
 
       stateReg := nextState
     }
+
     is(updateScoreBoard) { //Update the scoreBoard
       scoreUpdateRun := true.B
       when(scoreDecoder.io.done) {
+        scoreUpdateRun := false.B
         stateReg := done
         newLinesCleared := 0.U
       }.otherwise {
-        io.backBufferWriteData := scoreDecoder.io.update
+        io.backBufferWriteEnable := scoreDecoder.io.update
         io.backBufferWriteAddress := scoreDecoder.io.writeAddress
         io.backBufferWriteData := scoreDecoder.io.tileNumber
       }
     }
+
     is(done) {
       io.frameUpdateDone := true.B
       stateReg := idle

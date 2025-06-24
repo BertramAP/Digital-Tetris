@@ -40,26 +40,53 @@ class Top extends Module {
     // Sound
     val soundOut = Output(Bool())
   })
+  val clk50MHz = Wire(Clock())
+  val locked = Wire(Bool())
 
-  val gameTop = Module(new GameTop())
+  // $COVERAGE-OFF$
+  val pll = Module(new PLLBlackBox)
+  pll.io.clock := clock
+  pll.io.reset := ~RegNext(RegNext(RegNext(reset.asBool)))
+  clk50MHz := pll.io.clk50MHz
+  locked := pll.io.locked
 
   //Reset syncronization (and negation if needed)
   //Reset is active high in Chisel (reset = 1 means reset, reset = 0 means run)
   //Uncomment one of the following lines to select the reset mode of your FPGA pin
-  val syncResetInput = ~RegNext(RegNext(RegNext(reset.asBool))) //Active low (e.g., for reset button in Nexys A7 or switches in Basys3 and Nexys A7)
   //val syncResetInput = RegNext(RegNext(RegNext(reset.asBool))) //Active high (e.g., for buttons in Basys3 and Nexys A7)
 
   //Make sure that reset last at least RESET_MIN_DURATION_CC
+  /*
+  withClockAndReset(clk50MHz, !locked) {
+    val RESET_MIN_DURATION_CC = 5
+    val gameTop = Module(new GameTop())
+    val syncResetInput = ~RegNext(RegNext(RegNext(reset.asBool))) //Active low (e.g., for reset button in Nexys A7 or switches in Basys3 and Nexys A7)
+    val pipeResetReg = Reg(Vec(RESET_MIN_DURATION_CC, Bool()))
+    pipeResetReg(RESET_MIN_DURATION_CC - 1) := syncResetInput
+    for (i <- 0 until RESET_MIN_DURATION_CC - 1) {
+      pipeResetReg(i) := pipeResetReg(i + 1)
+    }
+    gameTop.reset := pipeResetReg.asUInt.orR
+
+    // Forwards all IOs
+    gameTop.io <> io
+  }
+   */
+
   val RESET_MIN_DURATION_CC = 5
+  val gameTop = Module(new GameTop())
+  val syncResetInput = ~RegNext(RegNext(RegNext(reset.asBool))) //Active low (e.g., for reset button in Nexys A7 or switches in Basys3 and Nexys A7)
   val pipeResetReg = Reg(Vec(RESET_MIN_DURATION_CC, Bool()))
   pipeResetReg(RESET_MIN_DURATION_CC - 1) := syncResetInput
   for (i <- 0 until RESET_MIN_DURATION_CC - 1) {
     pipeResetReg(i) := pipeResetReg(i + 1)
   }
-  gameTop.reset := pipeResetReg.asUInt.orR
+  gameTop.clock := clk50MHz
+  gameTop.reset := pipeResetReg.asUInt.orR || !locked
 
   // Forwards all IOs
   gameTop.io <> io
+
 
 }
 

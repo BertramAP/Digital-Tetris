@@ -51,8 +51,8 @@ class GraphicEngineVGA(SpriteNumber: Int, BackTileNumber: Int) extends Module {
   //VGA CONTROLLER
   ////////////////////////////////////
 
-  //VGA clock scaling (for 100MHz clock)
-  val SCALE_FACTOR = 4;
+  //VGA clock scaling (for 100MHz clock) //50mhz
+  val SCALE_FACTOR = 2;
 
   //VGA parameters
   val VGA_H_DISPLAY_SIZE = 640

@@ -74,3 +74,7 @@ Score registers need to be 16 bit wide
 ![img.png](images/letterA.png)
 ## Tile 31
 ![img.png](images/letterM.png)
+## Tile 32
+![img.png](images/letterB.png)
+## Tile 33
+![img.png](images/letterD.png)

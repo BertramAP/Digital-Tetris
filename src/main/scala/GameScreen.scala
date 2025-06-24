@@ -6,12 +6,13 @@ import scala.collection.immutable
 class GameScreen() extends Module {
   val io = IO(new Bundle() {
     //Switches
-    val sw = Input(Bool())
+    val sw = Input(Bool()) //Start
     val gameOver = Input(Bool())
     //Viewbox control output
     val viewBoxX = Output(UInt(10.W)) //0 to 640
     val viewBoxY = Output(UInt(9.W)) //0 to 480
     val staticScreen = Output(Bool())
+    val over = Output(Bool())
   })
   //Viewbox
   val viewBoxXReg = RegInit(0.U(10.W))
@@ -23,7 +24,7 @@ class GameScreen() extends Module {
   val currentScreen = RegInit(start)
   val static = RegInit(true.B)
   io.staticScreen := static
-
+  io.over := false.B
   //FSMD for gamescreens
   switch(currentScreen){
     is(start) {
@@ -43,9 +44,10 @@ class GameScreen() extends Module {
       static := false.B
     }
     is(over) {
-      when(!io.gameOver) {
+      when(io.sw) {
         currentScreen := game
       }
+      io.over := true.B
       static := true.B
       viewBoxXReg := 640.U
       viewBoxYReg := 480.U
