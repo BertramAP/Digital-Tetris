@@ -1,6 +1,10 @@
 ## SetUp
 After running sbt build (The compiled verilog file include needs to be regenerated) in the cmd and adding the all the verilog files to a vivado projects with the correct restraints files for your own board, you will have to go into clock wizard by opening the IP catalog in vivado under project manager. In IP catalog search for clock wizard and select the PLL option in the clocking options tab.
-
+![img.png](images/setup1.png)
+Give the output of the PLL clock a frequency of 50 mhz, and select the following options:
+![img.png](images/setup2.png)
+Know the PLL should be ready to be generated. Your design hierarchy, after adding the Pll.v file to design resources, should look like this:
+![img_1.png](images/setup3.png)
 ## Game Tutorial
 When starting the game, you will see the start screen. Here the start button is the central button on the basys board. This button is the same button used on the game over screen, to play again. When the tetris game is running, a piece will be generated pseudo randomly, that the player can move horizontally by pressing the buttons on either side depending on which way the player wants to move the piece.  The piece controlled by the player can be rotated by pressing the button up, and the player can also increase the piece falling speed by pressing the button down.
 Clearing more lines at once will give a better score, just note that the score is displayed in hexadecimal, but the level displayed is decimal. When the level increases, so will the fall speed when and when not pressing the down button.  When a piece is placed out of bounds the game will end, and the score and level will be reset.
