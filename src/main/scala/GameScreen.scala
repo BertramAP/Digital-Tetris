@@ -44,7 +44,7 @@ class GameScreen() extends Module {
       static := false.B
     }
     is(over) {
-      when(io.sw) {
+      when(io.sw && !io.gameOver) {
         currentScreen := game
       }
       io.over := true.B

@@ -57,7 +57,8 @@ class ScoreDecoder extends Module {
     is(11.U) {numbers(0) := 32.U }  // Tile B
     is(12.U) {numbers(0) := 7.U  }  // Tile C
     is(13.U) {numbers(0) := 33.U }  // Tile D
-    is(14.U) {numbers(0) := 34.U }  // Tile F
+    is(14.U) {numbers(0) := 2.U} //E
+    is(15.U) {numbers(0) := 34.U }  // Tile F
   }
   switch(score(7, 4)) {
     is(0.U)  {numbers(1) := 10.U }
@@ -74,7 +75,8 @@ class ScoreDecoder extends Module {
     is(11.U) {numbers(1) := 32.U }
     is(12.U) {numbers(1) := 7.U  }
     is(13.U) {numbers(1) := 33.U }
-    is(14.U) {numbers(1) := 34.U }
+    is(14.U) {numbers(1) := 2.U} //E
+    is(15.U) {numbers(1) := 34.U }
   }
   switch(score(11, 8)) {
     is(0.U)  {numbers(2) := 10.U }
@@ -87,11 +89,12 @@ class ScoreDecoder extends Module {
     is(7.U)  {numbers(2) := 17.U }
     is(8.U)  {numbers(2) := 18.U }
     is(9.U)  {numbers(2) := 19.U }
-    is(10.U) {numbers(2) := 30.U }
-    is(11.U) {numbers(2) := 32.U }
-    is(12.U) {numbers(2) := 7.U  }
-    is(13.U) {numbers(2) := 33.U }
-    is(14.U) {numbers(2) := 34.U }
+    is(10.U) {numbers(2) := 30.U } //A
+    is(11.U) {numbers(2) := 32.U } //B
+    is(12.U) {numbers(2) := 7.U  }  //C
+    is(13.U) {numbers(2) := 33.U } //D
+    is(14.U) {numbers(2) := 2.U} //E
+    is(15.U) {numbers(2) := 34.U } //F
   }
 
   switch(score(15, 12)) {
@@ -109,7 +112,8 @@ class ScoreDecoder extends Module {
     is(11.U) {numbers(3) := 32.U }
     is(12.U) {numbers(3) := 7.U  }
     is(13.U) {numbers(3) := 33.U }
-    is(14.U) {numbers(3) := 34.U }
+    is(14.U) {numbers(2) := 2.U} //E
+    is(15.U) {numbers(3) := 34.U }
   }
   switch(score(19,16)) { //write different tiles
     is(0.U) {numbers(4) := 10.U} // Tile 0
@@ -126,7 +130,8 @@ class ScoreDecoder extends Module {
     is(11.U) {numbers(4) := 32.U} //Tile B
     is(12.U) {numbers(4) := 7.U} //Tile C
     is(13.U) {numbers(4) := 33.U} //Tile D
-    is(14.U) {numbers(4) := 34.U} //Tile F
+    is(14.U) {numbers(2) := 2.U} //E
+    is(15.U) {numbers(4) := 34.U} //Tile F
   }
 
   when(lvlDec(0) > 9.U) {

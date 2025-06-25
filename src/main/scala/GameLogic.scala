@@ -96,6 +96,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
     grid(i) := 1.U
     grid(11*25 + i) := 1.U
   }
+  //For clearing grid
+  val clearCnt = RegInit(0.U(11.W))
+  val index = RegInit(200.U(12.W))
+  val emptyGrid = RegInit(false.B)
+  val nextLine = RegInit(0.U(7.W))
 
   //Two registers holding the sprite X and Y with the sprite initial position
   val blockStartX = -4.S(11.W)
@@ -138,8 +143,8 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   //Setting frame done to zero
   io.frameUpdateDone := false.B
 
-  // States
-  val idle :: task :: flashStart :: compute1 :: updateScoreBoard :: done :: Nil = Enum(6)
+  // States (clearBoard is WIP, for now just use the reset switch)
+  val idle :: task :: flashStart :: compute1 :: clearBoard :: updateScoreBoard :: done :: Nil = Enum(7)
   val stateReg = RegInit(idle)
 
   // Sprite movement
@@ -193,9 +198,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   // testReg := Mux(linesToClearCount > testReg, linesToClearCount, testReg)
   //val testReg2 = RegInit(false.B)
 
-  io.led(0) := blocksInLine(19)(0)
-  io.led(1) := blocksInLine(19)(1)
-  io.led(2) := blocksInLine(19)(2)
+  io.led(0) := gameOver
+  io.led(1) := clearCnt(1)
+  io.led(2) := clearCnt(2)
 
   val startShow = RegInit(false.B)
   val blkCnt = RegInit(0.U(6.W))
@@ -218,7 +223,11 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
   lvl := scoreDecoder.io.lvl
   scoreDecoder.io.clear := false.B
 
-
+  io.led(3) := clearCnt(3)
+  io.led(4) := clearCnt(4)
+  io.led(5) := clearCnt(5)
+  io.led(6) := clearCnt(6)
+  io.led(7) := clearCnt(7)
   when(lvl-1.U < 5.U) {
     maxCount := slowMovement(lvl - 1.U)
     maxCountFast := fastMovement(lvl - 1.U)
@@ -334,6 +343,39 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         }
       }
     }
+    is(clearBoard) {
+      when(!emptyGrid) {
+        grid := Seq.fill(300)(0.U(3.W))
+        // Setting bottom of screen
+        for (i <- 0 until 12) {
+          grid(i * 25 + 24) := 1.U
+        }
+
+        for (i <- 0 until 25) {
+          grid(i) := 1.U
+          grid(11*25 + i) := 1.U
+        }
+        emptyGrid := true.B
+      }
+
+      when(clearCnt >= 399.U) {
+        gameOver := false.B
+        clearCnt := 0.U
+        index := 200.U
+        emptyGrid := false.B
+        stateReg := done
+      }.otherwise {
+        index := index + 1.U
+        clearCnt := clearCnt + 1.U
+      }
+      when(nextLine === 19.U) {
+        nextLine := 0.U
+        index := index + 21.U
+      }. otherwise {nextLine := nextLine + 1.U}
+      io.backBufferWriteEnable := true.B
+      io.backBufferWriteData := 1.U
+      io.backBufferWriteAddress := index
+    }
     is(flashStart) { // flashes the words: PRESS START
       when(gameScreen.io.over) {
         screenOffSet := 707.U
@@ -360,7 +402,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           startTileCnt := 0.U
           blkCnt := 0.U
           startShow := false.B
-          stateReg := done
+          when(gameOver) {
+            stateReg := clearBoard
+          }.otherwise {stateReg := done}
         }.elsewhen(startTileCnt =/= 10.U) {startTileCnt := startTileCnt + 1.U}
       }.otherwise { // Show blank
         io.backBufferWriteAddress := startTileCnt * 40.U + screenOffSet
@@ -369,7 +413,9 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
           startTileCnt := 0.U
           blkCnt := 0.U
           startShow := true.B
-          stateReg := done
+          when(gameOver) {
+            stateReg := clearBoard
+          }.otherwise {stateReg := done}
         }.elsewhen(startTileCnt =/= 10.U) {startTileCnt := startTileCnt + 1.U}
       }
     }.otherwise {
@@ -516,7 +562,6 @@ class GameLogic(SpriteNumber: Int, BackTileNumber: Int, TuneNumber: Int) extends
         io.backBufferWriteData := scoreDecoder.io.tileNumber
       }
     }
-
     is(done) {
       io.frameUpdateDone := true.B
       stateReg := idle
