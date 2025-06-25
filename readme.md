@@ -1,5 +1,5 @@
 ## SetUp
-After running sbt build (The compiled verilog file include needs to be regenerated) in the cmd and adding the all the verilog files to a vivado projects with the correct restraints files for your own board, you will have to go into clock wizard by opening the IP catalog in vivado under project manager. In IP catalog search for clock wizard and select the PLL option in the clocking options tab.
+After running sbt build (since Top.v is in the gitIgnore file) in the cmd and adding the all the verilog files to a vivado projects with the correct restraints files for your own board, you will have to go into clock wizard by opening the IP catalog in vivado under project manager. In IP catalog search for clock wizard and select the PLL option in the clocking options tab.
 ![img.png](images/setup1.png)
 Give the output of the PLL clock a frequency of 50 mhz, and select the following options:
 ![img.png](images/setup2.png)
